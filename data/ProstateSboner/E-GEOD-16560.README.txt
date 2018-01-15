@@ -1,0 +1,27 @@
+File: E-XXXX-1234.idf.txt	MAGETAB format IDF file. txt format containing information on experiment type, design, submitters, citation information and details of experimental factors. For full description of the MAGETAB format see  http://www.ebi.ac.uk/systems-srv/mp/file-exchange/MAGE-TABv1.1.tar.gz
+
+File: E-XXXX-1234.idf.xls	MAGETAB format IDF file as above, in .xls format.
+
+File: E-XXXX-1234.sdrf.txt	MAGETAB format SDRF file. File containing the sample names, annotations, data file references (actual files are in the .raw.zip and .processed.zip archives) and protocol reference information. .txt format. This file is linked from the ArrayExpress user interface www.ebi.ac.uk/arrayexpress for each experiment next to the text 'detailed sample annotation'. This file represents the most complete representation of an experiment in tab delimited format. For full description of the MAGETAB format see  http://www.ebi.ac.uk/systems-srv/mp/file-exchange/MAGE-TABv1.1.tar.gz
+
+File: E-XXXX-1234.sdrf.xls 	MAGETAB format SDRF file as above, in.xls format.
+
+File: E-XXXX-1234.2columns.txt	Summary file listing the relationships between samples, experimental variables (Factors) and raw data files. This is a subset of the information from the SDRF file. If no raw data files are present then the file contains Factor information, if there is no Factor information then sample annotations and ontology references for these are provided in .txt format. This file is linked from the ArrayExpress user interface www.ebi.ac.uk/arrayexpress for each experiment next to the text 'sample annotation'
+
+File: E-XXXX-1234.2columns.xls	Summary file as above, in xls format.
+
+File: E-XXXX-1234.raw.#.zip	All raw data files in .cel, .txt or other manufacturer's native file format where files are very large. The sample annotation relating to these files can be found in the SDRF file. You may need proprietary software to open these files where they are not .txt format. ZIP format. This file is downloadable from the ArrayExpress user interface www.ebi.ac.uk/arrayexpress under the heading 'Raw Data'. Not all experiments have raw data.
+
+File: E-XXXX-1234.processed.#.zip	All processed data files from the experiment in .txt format. The sample annotation relating to these files can be found in the SDRF file. ZIP format. This file is downloadable from the ArrayExpress user interface www.ebi.ac.uk/arrayexpress under the heading 'Processed Data'. Not all experiments have processed data.
+
+File: E-XXXX-1234.biosamples.png	An image file representing the processing steps for each sample in the experiment. Typically the graph shows, from left to right: BioSource->BioSample->Extract->LabeledExtract->Hybridization->Raw Data. PNG image file format. This file is linked from the ArrayExpress user interface www.ebi.ac.uk/arrayexpress for each experiment next to the text 'Experiment Design'
+
+File: E-XXXX-1234.biosamples.map	Image map file for use with the biosamples.png image.
+
+File: E-XXXX-1234.biosamples.svg	An image file representing the processing steps for each sample in the experiment. Typically the graph shows, from left to right: BioSource->BioSample->Extract->LabeledExtract->Hybridization->Raw Data. SVG image file format. This file is linked from the ArrayExpress user interface www.ebi.ac.uk/arrayexpress for each experiment next to the text 'Experiment Design'
+
+File: E-XXXX-1234.mageml.tar.gz	MAGE-ML files and any related data external files as loaded into ArrayExpress. XML format. Use with CEL files from .cel archive if available.
+
+File: E-XXXX-1234.cel.tar.gz	An archive of the cel files submitted to ArrayExpress with their original names. For use with MAGE-ML from .mageml archive. Not all experiments have .cel data.
+
+More information on the ArrayExpress FTP site can be found here:http ://www.ebi.ac.uk/microarray/doc/help/FTP_archives.html
