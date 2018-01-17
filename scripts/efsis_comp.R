@@ -350,6 +350,7 @@ for (i in c(1:k.folds)){
   auc.efsis.consensus <- auc(y.test, pred.efsis.consensus.svm)
   auc.all <- c(auc.rgife, auc.ref, auc.chs, auc.efsis.form, auc.efsis.consensus)
   write.table(auc.all, paste(path.data, i, 'fold', '-', 'auc.txt', sep = ''), quote = F, col.names = F, row.names = F)
+  
   # Using ACC
   ## Train SVM classifiers
   
