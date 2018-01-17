@@ -5,12 +5,13 @@
 
 remove(list = ls())
 
-# library(rPython)  # to use RGIFE which is written in Python
+library(rPython)  # to use RGIFE which is written in Python
 library(foreign)
+library(caret)
 library(samr)
 library(GeoDE)
 library(FSelector)  # to use Chi-Square
-library(CORElearn)  # to use ReliefF
+library(CORElearn)  # to use ReliefF                                                                                                                                                                                       
 library(RankAggreg)
 library(e1071)
 library(pROC)
@@ -18,19 +19,19 @@ library(reshape)
 library(ggplot2)
 
 # ============ Parameters definition ===========
-
-path <- '../data/CNS/cns.arff'  # path to the data
-sep.file <- ' '  # the seperator used in the files loaded
+path.script <- setwd('/Users/xzh004/GitHub/EFSIS/scripts')
+path.data <- '../data/CNS/'  # path to the data
+data.file <- 'cns.arff'
+system(paste('cp', '-r', '../rgife/*', path.data))  # the code of RGIFE must be in the same directory as the data
+system('source activate python2')
+k.folds <- 10  # k-fold cross validation
+seed <- 12345
 num.sel.fea <- 7  # number of selected features
 num.round <- 5  # number of rounds of resampling
-label.control <- '1'
-label.treat <- '0'
 num.resample.control <- 4  # number of sampled samples in each round
 num.resample.treat <- 6
 num.train.control <- 16  # number of control samples in training set
 num.train.treat <- 29
-num.fea <- 7129  # number of features
-pos.label <- num.fea + 1  # the position of the label marked in the dataset (num.fea + 1 if after all attributes)
 
 wt <- 10  # the weight to be assigned to stability
 
@@ -63,49 +64,74 @@ cbind.all <- function(...){
 # =============== Data Preparation ===============
 
 # Load the data
-data.raw <- read.arff(path)  # row -> sample, column -> feature
+data.raw <- read.arff(paste(path.data, data.file))  # row -> sample, column -> feature
+
+# Get the general information about this dataset
+num.sample <- nrow(data.raw)  # number of samples
+num.fea <- ncol(data.raw) - 1  # number of features, but notice that the last column is the label
+pos.label <- num.fea + 1  # the position of the label marked in the dataset
 
 # Split into training and test sets
 labels <- data.raw[, pos.label]
+label.control <- levels(labels)[1]
+label.treat <- levels(labels)[2]  # only proper for 2-class classification problem
 index.control <- which(labels == label.control)
 index.treat <- which(labels == label.treat)
-set.seed(1234)
-index.train <- c(sample(index.control, num.train.control), sample(index.treat, num.train.treat))
-index.test <- c(index.control, index.treat)[-index.train]
+set.seed(seed)
+pos.control.train.list <- createFolds(index.control, k.folds, T, T)  # the function gives the position of samples based on the 1st parameter
+pos.treat.train.list <- createFolds(index.treat, k.folds, T, T)
 
-data.train <- data.raw[index.train, ]  # row -> sample, column -> feature
-data.test <- data.raw[index.test, ]
+# =============== k-folds CV scheme ===============
 
-fea.name <- colnames(data.train[1:num.fea])
-label.train <- data.train[, pos.label]
-
-# Prepare for the training and test data
-if (pos.label != 1){  # the label is after all attributes
+for (i in c(1:k.folds)){
+  
+  # =============== Data Preparation ===============
+  
+  index.train <- c(index.control[pos.control.train.list[[i]]], index.treat[pos.treat.train.list[[i]]])
+  index.test <- c(index.control, index.treat)[-index.train]
+  data.train <- data.raw[index.train, ]  # row -> sample, column -> feature
+  data.test <- data.raw[index.test, ]
+  
+  # save the data
+  data.train.file.name <- paste(i, 'fold', '-', 'train', '-', data.file, sep = '')
+  data.test.file.name <- paste(i, 'fold', '-', 'test', '-', data.file, sep = '')
+  write.arff(data.train, paste(path.data, data.train.file.name, sep = ''))
+  write.arff(data.test, paste(path.data, data.test.file.name, sep = ''))
+  
+  fea.name <- colnames(data.train[1:num.fea])
+  label.train <- data.train[, pos.label]
+  
+  # Prepare for the training and test data
+  
   x.train.temp <- t(data.train[, 1:num.fea])  # usually row -> features, transform if not
   x.test.temp <- t(data.test[, 1:num.fea])
-} else if (pos.label == 1){  # the label is before all attrbutes
-  x.train.temp <- t(data.train[, 2:(1+num.fea)])  # usually row -> features, transform if not
-  x.test.temp <- t(data.test[, 2:(1+num.fea)])
-} else {
-  print('ERROR!! Where is the label in the dataset?!!')
+  
+  # Normalization (Avoid using info from test set)
+  
+  x.mean <- apply(x.train.temp, 1, mean)
+  x.sd <- apply(x.train.temp, 1, sd)
+  x.train <- (x.train.temp - x.mean) / x.sd  # row --> feature, column --> sample
+  x.test <- (x.test.temp - x.mean) / x.sd
+  x.train[is.na(x.train)] <- 0
+  x.test[is.na(x.test)] <- 0
+  
+  y.train <- data.train[, pos.label]
+  y.test <- data.test[, pos.label]
+  
+  # =============== Feature Selection using RGIFE ===============
+  
+  setwd(path.data)
+  system(paste('python', ' ', 'rgife.py', ' ', 'configuration.conf', ' ', data.train.file.name, sep = ''))  # python 2.7.13 is needed to execute RGIFE
+  data.sel.fea.rgife <- read.arff(paste(path, 'selected_best_data_cns_train.arff', sep = '/'))
+  sel.fea.rgife <- colnames(data.sel.fea.rgife[, -ncol(data.sel.fea.rgife)])
+  setwd(path.script)
 }
 
-# Normalization (Avoid using info from test set)
 
-x.mean <- apply(x.train.temp, 1, mean)
-x.sd <- apply(x.train.temp, 1, sd)
-x.train <- (x.train.temp - x.mean) / x.sd  # row --> feature, column --> sample
-x.test <- (x.test.temp - x.mean) / x.sd
-x.train[is.na(x.train)] <- 0
-x.test[is.na(x.test)] <- 0
 
-y.train <- data.train[, pos.label]
-y.test <- data.test[, pos.label]
 
-# =============== Feature Selection using RGIFE ===============
 
-data.sel.fea.rgife <- read.arff(paste(path, 'selected_best_data_cns_train.arff', sep = '/'))
-sel.fea.rgife <- colnames(data.sel.fea.rgife[, -ncol(data.sel.fea.rgife)])
+
 
 # =============== Feature Selection using ReliefF ===============
 

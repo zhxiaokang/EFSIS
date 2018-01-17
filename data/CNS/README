@@ -1,0 +1,120 @@
+RGIFE - Ranked Guided Iterative Feature Elimination heuristic.
+
+Copyright (C) 2015-2016  Nicola Lazzarini
+School of Computing Science, Newcastle University
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+more details: http://www.gnu.org/licenses/gpl.html
+
+
+DESCRIPTION
+-----------
+
+RGIFE is a feature reduction heuristic for the identification of small panels of
+highly predictive biomarkers. The heuristic is based on an iterative reduction paradigm:
+first train a classifier, then rank the attributes based on their importance and
+finally remove attributes in block. RGIFE is designed to work with large-scale datasets
+and identifies reduced set of attributes with high classification power.
+
+
+REQUIREMENTS
+------------
+
+RGIFE is written in Python and is able to run on GNU/Linux, MacOS or Windows systems.
+
+To run it requires the following software installed:
+
+* Python 2.7.x - https://www.python.org/ (Python Software Foundation Licence)
+* NumPy - http://www.numpy.org/ (BSD Licence)
+* SciPy - http://www.scipy.org/ (BSD Licence)
+* scikit-learn - http://scikit-learn.org/ (BSD Licence)
+
+
+
+CONFIGURATION
+--------------
+
+In the RGIFE folder there is an example configuration file called configuration.conf
+The content of the file is the following:
+
+	[parameters]
+	block_type = RBS
+	validation: 10CV
+	cv_schema = DB_SCV
+	repetitions = 1
+	different_folds = no
+	tolerance_samples = 1
+	metric = accuracy
+	trees = 3000
+	max_depth = 5
+	cs_rf = yes
+	misclassification_cost = 1,1
+	missing_values = no
+	categorical_attributes = no
+
+Please check the tutorial available at: http://ico2s.org/software/tutorials/rgife.html
+for a complete description of each RGIFE parameter.
+
+
+RUN
+----
+
+To apply the RGIFE heuristic run the following script:
+
+	./rgife.py <dataset> <configuration>
+
+The script requires only two parameters:
+
+* dataset - biological data in ARFF format
+* configuration - configuration file
+
+RGIFE will generate two folders as output (BestIteration and ReferenceIteration) that contain the reduced dataset with the attributes selected by the two iterations.
+The iterations.tar.xz archive contains instead all the intermediate data used during the reduction process.
+
+
+POSTPROCESSING
+---
+
+Multiple runs of RGIFE might identify different models with similar performances due to the stochastic nature of the heuristic.
+Three different polices can be used to select the final model from the output of multiple executions:
+
+* Min: select the model having the smallest number of attributes
+* Max: select the model having the largest number of attributes
+* Union: the final model is the union of the models generated across different
+executions
+
+In the RGIFE folder there is a script called policies.py that generate, from multiple executions of RGIFE, the models using the 3 different policies.
+
+	./policies.py <path_to_results> <RGIFE_executions>
+
+The script requires two parameters:
+
+* path_to_results - the folders in which the results from multiple executions of RGIFE are stored. The folders containing the single results of RGIFE need to be named Run1, Run2, ... etc.
+* RGIFE_executions - number of RGIFE executions (same value used for the last Run folder)
+
+If we run RGIFE 5 times and we collect the results in the RGIFE_experiment folder:
+
+	./policies.py RGIFE_experiments 5
+
+Where the RGIFE_experiment folder is structured as:
+
+	/RGIFE_experiment
+		/Run1
+			/BestIteration
+			/ReferenceIteration
+		/Run2
+		/Run3
+		/Run4
+		/Run5
+
+CONTACT
+---
+
+If you have any futher questions or comments about RGIFE please contact us at: jaume.bacardit@ncl.ac.uk
