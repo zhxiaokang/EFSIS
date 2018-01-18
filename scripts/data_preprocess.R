@@ -27,5 +27,13 @@ prostate.singh.class.df <- as.data.frame.matrix(t(prostate.singh.class))
 prostate.singh.df <- cbind(prostate.singh.feature.df, prostate.singh.class.df)
 write.arff(prostate.singh.df, '../data/ProstateSingh/prostate.singh.arff')
 
-# AML
+# Breast
+breast.feature <- read.table('../data/Breast/breast_preprocessed.txt', row.names = 1, nrows = 47293)
+breast.class <- read.table('../data/Breast/breast_preprocessed.txt', row.names = 1, skip = 47293)
+breast.feature.df <- as.data.frame.matrix(t(breast.feature))
+breast.class.df <- as.data.frame.matrix(t(breast.class))
+breast.df <- cbind(breast.feature.df, breast.class.df)
+write.arff(breast.df, '../data/Breast/breast.arff')
+
+
 
