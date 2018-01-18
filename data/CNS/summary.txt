@@ -1,9 +1,6 @@
-RGIFE selected 7 attributes that provide accuracy = 0.9233333
+RGIFE selected 4 attributes that provide accuracy = 0.9666667
 == Selected attributes ==
-S71824_at
-U28963_at
-U37673_at
-X59656_at
-Z26317_at
-HG3925-HT4195_at
-D17793_at
+L13923_at
+L33243_at
+U07563_cds1_at
+U75276_s_at

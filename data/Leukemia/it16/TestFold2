@@ -1,0 +1,81 @@
+@relation it16
+@attribute D14664_at numeric
+@attribute D42043_at numeric
+@attribute D49950_at numeric
+@attribute D88270_at numeric
+@attribute D88422_at numeric
+@attribute HG1612-HT1612_at numeric
+@attribute HG3494-HT3688_at numeric
+@attribute J05243_at numeric
+@attribute L09717_at numeric
+@attribute L21954_at numeric
+@attribute L47738_at numeric
+@attribute M11722_at numeric
+@attribute M13792_at numeric
+@attribute M14636_at numeric
+@attribute M16038_at numeric
+@attribute M19507_at numeric
+@attribute M22960_at numeric
+@attribute M23197_at numeric
+@attribute M27891_at numeric
+@attribute M29696_at numeric
+@attribute M31166_at numeric
+@attribute M31303_rna1_at numeric
+@attribute M33680_at numeric
+@attribute M55150_at numeric
+@attribute M62762_at numeric
+@attribute M63138_at numeric
+@attribute M63379_at numeric
+@attribute M84526_at numeric
+@attribute M92287_at numeric
+@attribute M93056_at numeric
+@attribute M96326_rna1_at numeric
+@attribute S82470_at numeric
+@attribute U05259_rna1_at numeric
+@attribute U16954_at numeric
+@attribute U46499_at numeric
+@attribute U50136_rna1_at numeric
+@attribute U70063_at numeric
+@attribute U97105_at numeric
+@attribute X07743_at numeric
+@attribute X17042_at numeric
+@attribute X51521_at numeric
+@attribute X52056_at numeric
+@attribute X59417_at numeric
+@attribute X61587_at numeric
+@attribute X62320_at numeric
+@attribute X62654_rna1_at numeric
+@attribute X66401_cds1_at numeric
+@attribute X70297_at numeric
+@attribute X76648_at numeric
+@attribute X95735_at numeric
+@attribute X98411_at numeric
+@attribute Y07604_at numeric
+@attribute Z49194_at numeric
+@attribute Z15115_at numeric
+@attribute X06182_s_at numeric
+@attribute U22376_cds2_s_at numeric
+@attribute U05572_s_at numeric
+@attribute M32304_s_at numeric
+@attribute L09209_s_at numeric
+@attribute M12959_s_at numeric
+@attribute Y00787_s_at numeric
+@attribute M19508_xpt3_s_at numeric
+@attribute M31211_s_at numeric
+@attribute M63838_s_at numeric
+@attribute M83652_s_at numeric
+@attribute M83667_rna1_s_at numeric
+@attribute X85116_rna1_s_at numeric
+@attribute U49020_cds2_s_at numeric
+@attribute M31523_at numeric
+@attribute X16546_at numeric
+@attribute U29175_at numeric
+@attribute CLASS {'ALL','AML'}
+@data
+586,1698,117,-68,71,3182,323,447,336,942,643,1234,8469,1214,534,1441,1080,286,375,754,20,6633,4371,1822,2376,4215,311,-158,2360,3786,7,5157,218,82,3107,1837,154,199,1136,1150,3782,400,2455,2127,1647,648,1456,199,660,926,1551,2084,-161,3714,2165,7155,-203,852,3755,1300,282,1894,374,1222,78,-91,1263,710,989,811,917,'ALL'
+-74,1089,97,3939,51,5083,283,773,-11,1916,579,8791,1850,51,252,-60,699,128,502,1695,13,4112,4247,441,1393,1169,263,-38,5600,62,330,458,11999,845,-87,188,-59,1294,-151,155,1516,-1,5420,72,364,361,2947,-42,800,-152,474,1414,892,3423,-10,3686,-2,240,289,342,16,409,710,1042,-177,-56,121,348,1955,185,1691,'ALL'
+18,1826,142,6955,86,2621,352,382,-9,564,444,12307,4662,120,87,-146,601,117,78,1479,23,2462,6024,309,1062,1551,216,-31,7477,100,621,818,4200,121,14,470,25,938,142,1327,2349,53,3770,-298,1034,721,2072,-37,679,-61,337,1781,150,2886,-4,2943,80,455,1110,389,149,493,467,1468,48,4847,400,417,1275,185,479,'ALL'
+290,4034,145,7873,204,4787,89,1226,142,908,1235,5653,9487,128,462,87,1021,74,163,1968,17,3691,11146,859,1618,1576,240,115,6203,3077,575,1516,6101,212,1,1049,135,2357,628,2282,5318,406,6609,507,958,1269,2009,-54,1690,1931,646,641,425,5549,52,8402,-97,370,1053,503,257,740,580,1106,338,-117,1763,1532,3923,318,1088,'ALL'
+159,1464,259,146,347,2856,861,628,131,2322,683,1284,4148,303,2680,209,1571,774,12339,438,174,1985,6414,1514,4249,7373,480,141,1024,925,976,3869,306,-69,167,2535,678,1309,459,3259,2039,595,1214,549,2598,1696,720,522,165,3297,1300,977,-49,1843,6,1047,-296,1206,2212,737,12715,1031,339,216,657,522,1017,190,671,454,688,'AML'
+536,1008,283,21,7109,1031,2670,-92,360,7867,8,455,1297,220,2727,2005,3927,970,17863,268,1851,1885,2040,1707,4647,12358,1037,4573,1309,2310,7955,1282,-14,-106,2046,3965,741,551,4004,10603,1444,2910,1648,2801,14198,4797,705,517,358,4863,1710,1506,21,2007,124,473,1191,2892,5814,645,17022,1575,88,251,2892,3890,1096,82,126,2776,412,'AML'
+221,742,211,46,995,522,581,48,187,1693,446,74,1319,112,2089,10171,1617,593,2745,416,291,1140,1844,1339,2120,2815,5849,9851,583,1393,17279,2785,382,-253,1269,2335,207,44,788,6957,1088,788,764,1412,2397,1675,128,915,168,2335,856,1424,-44,1142,255,376,490,1381,1518,422,20459,3049,64,66,852,-130,1512,36,110,1957,382,'AML'
