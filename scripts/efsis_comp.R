@@ -5,7 +5,7 @@
 
 remove(list = ls())
 
-library(rPython)  # to use RGIFE which is written in Python
+# library(rPython)  # to use RGIFE which is written in Python
 library(foreign)
 library(caret)
 library(samr)
@@ -19,18 +19,13 @@ library(reshape)
 library(ggplot2)
 
 # ============ Parameters definition ===========
-path.script <- setwd('/Users/xzh004/GitHub/EFSIS/scripts')
+path.script <- setwd('/export/jonassenfs/xiaokangz/projects/EFSIS/scripts')
 path.data <- '../data/CNS/'  # path to the data
 data.file <- 'cns.arff'
 system(paste('cp', '-r', '../rgife/*', path.data))  # the code of RGIFE must be in the same directory as the data
 k.folds <- 10  # k-fold cross validation
 seed <- 12345
-num.sel.fea <- 7  # number of selected features
-num.round <- 5  # number of rounds of resampling
-num.resample.control <- 4  # number of sampled samples in each round
-num.resample.treat <- 6
-num.train.control <- 16  # number of control samples in training set
-num.train.treat <- 29
+
 
 wt <- 10  # the weight to be assigned to stability
 
@@ -210,6 +205,8 @@ for (i in c(1:k.folds)){
   # =============== Data Preparation ===============
   
   index.train <- c(index.control[pos.control.train.list[[i]]], index.treat[pos.treat.train.list[[i]]])
+  index.train.control <- index.control[pos.control.train.list[[i]]]
+  index.train.treat <- index.treat[pos.treat.train.list[[i]]]
   index.test <- c(index.control, index.treat)[-index.train]
   data.train <- data.raw[index.train, ]  # row -> sample, column -> feature
   data.test <- data.raw[index.test, ]
@@ -270,6 +267,9 @@ for (i in c(1:k.folds)){
   
   # =============== Feature Selection using EFSIS ===============
   
+  num.round <- 5  # number of rounds of resampling
+  num.resample.control <- ceiling(length(index.train.control) / num.round)  # number of sampled samples in each round
+  num.resample.treat <- ceiling(length(index.train.treat) / num.round)
   output.list.efsis <- efsis()
   sel.fea.efsis.form <- output.list.efsis$sel.fea.efsis.form
   sel.fea.efsis.consensus <- output.list.efsis$sel.fea.efsis.consensus
