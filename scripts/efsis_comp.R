@@ -20,14 +20,11 @@ library(ggplot2)
 
 # ============ Parameters definition ===========
 path.script <- setwd('/export/jonassenfs/xiaokangz/projects/EFSIS/scripts')
-path.data <- '../data/CNS/'  # path to the data
-data.file <- 'cns.arff'
+path.data <- '../data/ProstateSingh/'  # path to the data
+data.file <- 'prostate.singh.arff'
 system(paste('cp', '-r', '../rgife/*', path.data))  # the code of RGIFE must be in the same directory as the data
 k.folds <- 10  # k-fold cross validation
 seed <- 12345
-
-
-wt <- 10  # the weight to be assigned to stability
 
 # ============ function definition ===========
 
