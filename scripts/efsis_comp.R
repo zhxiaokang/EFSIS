@@ -1,5 +1,5 @@
 # EFSIS (Ensemble of Feature Selection Integrating Stability
-# Ensemble of Chi-Squared and ReliefF. Compare with ReliefF, Chi-Squared, RGIFE
+# Ensemble of Chi-Squared and ReliefF, using both formula and consensus ranking to integrate them. Compare with ReliefF, Chi-Squared, RGIFE
 # The number of selected features is decided by RGIFE
 # Use 10-fold cross-validation to get 10 prediction accuracies
 
