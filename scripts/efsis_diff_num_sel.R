@@ -17,10 +17,9 @@ library(reshape)
 library(ggplot2)
 
 # ============ Parameters definition ===========
-path.script <- setwd('/export/jonassenfs/xiaokangz/projects/EFSIS/scripts')
+path.script <- setwd('/export/jonassenfs/xiaokangz/project/EFSIS/scripts')
 path.data <- '../data/Leukemia/'  # path to the data
 data.file <- 'leukemia.arff'
-system(paste('cp', '-r', '../rgife/*', path.data))  # the code of RGIFE must be in the same directory as the data
 nums.sel.fea <- seq(4, 50, 2)
 k.folds <- 10  # k-fold cross validation
 num.round <- 5  # number of rounds of resampling for EFSIS
