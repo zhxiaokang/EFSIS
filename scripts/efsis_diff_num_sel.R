@@ -382,7 +382,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     sel.fea.efsis.consensus.sam.geode <- output.list.efsis$sel.fea.efsis.consensus.sam.geode
     sel.fea.efsis.consensus.ref.chs <- output.list.efsis$sel.fea.efsis.consensus.ref.chs
     sel.fea.efsis.consensus.sam.geode.ref.chs <- output.list.efsis$sel.fea.efsis.consensus.sam.geode.ref.chs
-      
+    
     # save the selected features
     
     sel.fea.ref.folds <- cbind.all(sel.fea.ref.folds, sel.fea.ref)
