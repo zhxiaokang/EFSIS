@@ -375,9 +375,13 @@ for (num.sel.fea in c(nums.sel.fea)){
     num.resample.control <- ceiling(length(index.train.control) / num.round)  # number of sampled samples in each round
     num.resample.treat <- ceiling(length(index.train.treat) / num.round)
     output.list.efsis <- efsis()
-    sel.fea.efsis.form <- output.list.efsis$sel.fea.efsis.form
-    sel.fea.efsis.consensus <- output.list.efsis$sel.fea.efsis.consensus
-    
+    sel.fea.efsis.form.sam.geode <- output.list.efsis$sel.fea.efsis.form.sam.geode
+    sel.fea.efsis.form.ref.chs <- output.list.efsis$sel.fea.efsis.form.ref.chs
+    sel.fea.efsis.form.sam.geode.ref.chs <- output.list.efsis$sel.fea.efsis.form.sam.geode.ref.chs
+    sel.fea.efsis.consensus.sam.geode <- output.list.efsis$sel.fea.efsis.consensus.sam.geode
+    sel.fea.efsis.consensus.ref.chs <- output.list.efsis$sel.fea.efsis.consensus.ref.chs
+    sel.fea.efsis.consensus.sam.geode.ref.chs <- output.list.efsis$sel.fea.efsis.consensus.sam.geode.ref.chs
+      
     # save and record the selected features
     
     write.table(sel.fea.rgife, file = paste(path.data, i, 'fold', '-', 'sel-rgife.txt', sep = ''), quote = F, col.names = F, row.names = F)
