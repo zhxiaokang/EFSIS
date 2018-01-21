@@ -18,17 +18,18 @@ library(ggplot2)
 
 # ============ Parameters definition ===========
 path.script <- setwd('/export/jonassenfs/xiaokangz/projects/EFSIS/scripts')
-path.data <- '../data/Breast/'  # path to the data
-data.file <- 'breast.arff'
+path.data <- '../data/Leukemia/'  # path to the data
+data.file <- 'leukemia.arff'
 system(paste('cp', '-r', '../rgife/*', path.data))  # the code of RGIFE must be in the same directory as the data
 nums.sel.fea <- seq(4, 50, 2)
 k.folds <- 10  # k-fold cross validation
+num.round <- 5  # number of rounds of resampling for EFSIS
 seed <- 12345
 
 # ============ function definition ===========
 
 # define the function of calculating stability
-stab <- function(dataFrame, num.round){
+stab <- function(dataFrame){
   num.round <- num.round  # number of resampling rounds
   union <- Reduce(union, dataFrame)  # F in the formula: the list of all features, which have been selected in at least one of n sampling steps
   whole <- unlist(list(dataFrame))  # all the features in List (with replicate)
@@ -270,18 +271,19 @@ pos.treat.train.list <- createFolds(index.treat, k.folds, T, T)
 for (num.sel.fea in c(nums.sel.fea)){
   # =============== k-folds CV scheme ===============
   
-  # data frame to record the predictions (not probabilities)
-  pred.rgife.svm.folds <- data.frame()
-  pred.ref.svm.folds <- data.frame()
-  pred.chs.svm.folds <- data.frame()
-  pred.efsis.form.folds <- data.frame()
-  pred.efsis.consensus.folds <- data.frame()
-  
-  sel.fea.rgife.folds <- data.frame()
+  sel.fea.sam.folds <- data.frame()
+  sel.fea.geode.folds <- data.frame()
   sel.fea.ref.folds <- data.frame()
   sel.fea.chs.folds <- data.frame()
-  sel.fea.efsis.form.folds <- data.frame()
-  sel.fea.efsis.consensus.folds <- data.frame()
+  sel.fea.efsis.form.sam.geode.folds <- data.frame()
+  sel.fea.efsis.form.ref.chs.folds <- data.frame()
+  sel.fea.efsis.form.sam.geode.ref.chs.folds <- data.frame()
+  sel.fea.efsis.consensus.sam.geode.folds <- data.frame()
+  sel.fea.efsis.consensus.ref.chs.folds <- data.frame()
+  sel.fea.efsis.consensus.sam.geode.ref.chs.folds <- data.frame()
+  
+  auc.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'chs', 'form_sam-geode', 'form_ref-chs', 'form_sam-geode-ref-chs', 
+                                            'consensus_sam-geode', 'consensus_ref-chs', 'consensus_sam-geode-ref-chs'))
   
   for (i in c(1:k.folds)){
     
@@ -371,7 +373,6 @@ for (num.sel.fea in c(nums.sel.fea)){
     
     # =============== Feature Selection using EFSIS ===============
     
-    num.round <- 5  # number of rounds of resampling
     num.resample.control <- ceiling(length(index.train.control) / num.round)  # number of sampled samples in each round
     num.resample.treat <- ceiling(length(index.train.treat) / num.round)
     output.list.efsis <- efsis()
@@ -382,18 +383,15 @@ for (num.sel.fea in c(nums.sel.fea)){
     sel.fea.efsis.consensus.ref.chs <- output.list.efsis$sel.fea.efsis.consensus.ref.chs
     sel.fea.efsis.consensus.sam.geode.ref.chs <- output.list.efsis$sel.fea.efsis.consensus.sam.geode.ref.chs
       
-    # save and record the selected features
+    # save the selected features
     
-    write.table(sel.fea.rgife, file = paste(path.data, i, 'fold', '-', 'sel-rgife.txt', sep = ''), quote = F, col.names = F, row.names = F)
-    write.table(sel.fea.ref, file = paste(path.data, i, 'fold', '-', 'sel-ref.txt', sep = ''), quote = F, col.names = F, row.names = F)
-    write.table(sel.fea.chs, file = paste(path.data, i, 'fold', '-', 'sel-chs.txt', sep = ''), quote = F, col.names = F, row.names = F)
-    write.table(sel.fea.efsis.form, file = paste(path.data, i, 'fold', '-', 'sel-efsis-form.txt', sep = ''), quote = F, col.names = F, row.names = F)
-    write.table(sel.fea.efsis.consensus, file = paste(path.data, i, 'fold', '-', 'sel-efsis-consensus.txt', sep = ''), quote = F, col.names = F, row.names = F)
-    
-    sel.fea.rgife.folds <- cbind.all(sel.fea.rgife.folds, sel.fea.rgife)
     sel.fea.ref.folds <- cbind.all(sel.fea.ref.folds, sel.fea.ref)
     sel.fea.chs.folds <- cbind.all(sel.fea.chs.folds, sel.fea.chs)
     sel.fea.efsis.form.folds <- cbind.all(sel.fea.efsis.form.folds, sel.fea.efsis.form)
+    sel.fea.efsis.form.folds <- cbind.all(sel.fea.efsis.form.folds, sel.fea.efsis.form)
+    sel.fea.efsis.form.folds <- cbind.all(sel.fea.efsis.form.folds, sel.fea.efsis.form)
+    sel.fea.efsis.consensus.folds <- cbind.all(sel.fea.efsis.consensus.folds, sel.fea.efsis.consensus)
+    sel.fea.efsis.consensus.folds <- cbind.all(sel.fea.efsis.consensus.folds, sel.fea.efsis.consensus)
     sel.fea.efsis.consensus.folds <- cbind.all(sel.fea.efsis.consensus.folds, sel.fea.efsis.consensus)
     
     # =============== END of Selecting Features ===============
@@ -402,24 +400,35 @@ for (num.sel.fea in c(nums.sel.fea)){
     
     # Prepare the data sets for classificaion, usually row --> sample, col --> feature
     
-    train.rgife <- t(x.train[sel.fea.rgife, ])
+    train.sam <- t(x.train[sel.fea.sam, ])
+    train.geode <- t(x.train[sel.fea.geode, ])
     train.ref <- t(x.train[sel.fea.ref, ])
     train.chs <- t(x.train[sel.fea.chs, ])
-    train.efsis.form <- t(x.train[sel.fea.efsis.form, ])
+    train.efsis.form.sam.geode <- t(x.train[sel.fea.efsis.form.sam.geode, ])
+    train.efsis.form.ref.chs <- t(x.train[sel.fea.efsis.form.ref.chs, ])
+    train.efsis.form.sam.geode.ref.chs <- t(x.train[sel.fea.efsis.form.sam.geode.ref.chs, ])
     train.efsis.consensus <- t(x.train[sel.fea.efsis.consensus, ])
     
-    test.rgife <- t(x.test[sel.fea.rgife, ])
+    test.sam <- t(x.test[sel.fea.sam, ])
+    test.geode <- t(x.test[sel.fea.geode, ])
     test.ref <- t(x.test[sel.fea.ref, ])
     test.chs <- t(x.test[sel.fea.chs, ])
-    test.efsis.form <- t(x.test[sel.fea.efsis.form, ])
-    test.efsis.consensus <- t(x.test[sel.fea.efsis.consensus, ])
+    test.efsis.form.sam.geode <- t(x.test[sel.fea.efsis.form.sam.geode, ])
+    test.efsis.form.ref.chs <- t(x.test[sel.fea.efsis.form.ref.chs, ])
+    test.efsis.form.sam.geode.ref.chs <- t(x.test[sel.fea.efsis.form.sam.geode.ref.chs, ])
+    test.efsis.consensus.sam.geode <- t(x.test[sel.fea.efsis.consensus.sam.geode, ])
+    test.efsis.consensus.ref.chs <- t(x.test[sel.fea.efsis.consensus.ref.chs, ])
+    test.efsis.consensus.sam.geode.ref.chs <- t(x.test[sel.fea.efsis.consensus.sam.geode.ref.chs, ])
     
     # Use SVM to test the performance
     
     ## Prepare the data sets for SVM
     
-    train.rgife.svm <- data.frame(cbind(train.rgife, y.train))
-    test.rgife.svm <- data.frame(test.rgife)
+    train.sam.svm <- data.frame(cbind(train.sam, y.train))
+    test.sam.svm <- data.frame(test.sam)
+    
+    train.geode.svm <- data.frame(cbind(train.geode, y.train))
+    test.geode.svm <- data.frame(test.geode)
     
     train.ref.svm <- data.frame(cbind(train.ref, y.train))
     test.ref.svm <- data.frame(test.ref)
@@ -427,64 +436,86 @@ for (num.sel.fea in c(nums.sel.fea)){
     train.chs.svm <- data.frame(cbind(train.chs, y.train))
     test.chs.svm <- data.frame(test.chs)
     
-    train.efsis.form.svm <- data.frame(cbind(train.efsis.form, y.train))
-    test.efsis.form.svm <- data.frame(test.efsis.form)
+    train.efsis.form.sam.geode.svm <- data.frame(cbind(train.efsis.form.sam.geode, y.train))
+    test.efsis.form.sam.geode.svm <- data.frame(test.efsis.form.sam.geode)
     
-    train.efsis.consensus.svm <- data.frame(cbind(train.efsis.consensus, y.train))
-    test.efsis.consensus.svm <- data.frame(test.efsis.consensus)
+    train.efsis.form.ref.chs.svm <- data.frame(cbind(train.efsis.form.ref.chs, y.train))
+    test.efsis.form.ref.chs.svm <- data.frame(test.efsis.form.ref.chs)
+    
+    train.efsis.form.sam.geode.ref.chs.svm <- data.frame(cbind(train.efsis.form.sam.geode.ref.chs, y.train))
+    test.efsis.form.sam.geode.ref.chs.svm <- data.frame(test.efsis.form.sam.geode.ref.chs)
+    
+    train.efsis.consensus.sam.geode.svm <- data.frame(cbind(train.efsis.consensus.sam.geode, y.train))
+    test.efsis.consensus.sam.geode.svm <- data.frame(test.efsis.consensus.sam.geode)
+    
+    train.efsis.consensus.ref.chs.svm <- data.frame(cbind(train.efsis.consensus.ref.chs, y.train))
+    test.efsis.consensus.ref.chs.svm <- data.frame(test.efsis.consensus.ref.chs)
+    
+    train.efsis.consensus.sam.geode.ref.chs.svm <- data.frame(cbind(train.efsis.consensus.sam.geode.ref.chs, y.train))
+    test.efsis.consensus.sam.geode.ref.chs.svm <- data.frame(test.efsis.consensus.sam.geode.ref.chs)
     
     ## Train SVM classifiers
     
-    model.rgife.svm <- svm(formula = factor(y.train)~., data = train.rgife.svm, probability = TRUE)
+    model.sam.svm <- svm(formula = factor(y.train)~., data = train.sam.svm, probability = TRUE)
+    model.geode.svm <- svm(formula = factor(y.train)~., data = train.geode.svm, probability = TRUE)
     model.ref.svm <- svm(formula = factor(y.train)~., data = train.ref.svm, probability = TRUE)
     model.chs.svm <- svm(formula = factor(y.train)~., data = train.chs.svm, probability = TRUE)
-    model.efsis.form.svm <- svm(formula = factor(y.train)~., data = train.efsis.form.svm, probability = TRUE)
-    model.efsis.consensus.svm <- svm(formula = factor(y.train)~., data = train.efsis.consensus.svm, probability = TRUE)
+    model.efsis.form.sam.geode.svm <- svm(formula = factor(y.train)~., data = train.efsis.form.sam.geode.svm, probability = TRUE)
+    model.efsis.form.ref.chs.svm <- svm(formula = factor(y.train)~., data = train.efsis.form.ref.chs.svm, probability = TRUE)
+    model.efsis.form.sam.geode.ref.chs.svm <- svm(formula = factor(y.train)~., data = train.efsis.form.sam.geode.ref.chs.svm, probability = TRUE)
+    model.efsis.consensus.sam.geode.svm <- svm(formula = factor(y.train)~., data = train.efsis.consensus.sam.geode.svm, probability = TRUE)
+    model.efsis.consensus.ref.chs.svm <- svm(formula = factor(y.train)~., data = train.efsis.consensus.ref.chs.svm, probability = TRUE)
+    model.efsis.consensus.sam.geode.ref.chs.svm <- svm(formula = factor(y.train)~., data = train.efsis.consensus.sam.geode.ref.chs.svm, probability = TRUE)
     
     ## Prediction on the test set
     
-    pred.rgife.svm <- attr(predict(model.rgife.svm, test.rgife.svm, probability = TRUE), 'probabilities')[, 2]
+    pred.sam.svm <- attr(predict(model.sam.svm, test.sam.svm, probability = TRUE), 'probabilities')[, 2]
+    pred.geode.svm <- attr(predict(model.geode.svm, test.geode.svm, probability = TRUE), 'probabilities')[, 2]
     pred.ref.svm <- attr(predict(model.ref.svm, test.ref.svm, probability = TRUE), 'probabilities')[, 2]
     pred.chs.svm <- attr(predict(model.chs.svm, test.chs.svm, probability = TRUE), 'probabilities')[, 2]
-    pred.efsis.form.svm <- attr(predict(model.efsis.form.svm, test.efsis.form.svm, probability = TRUE), 'probabilities')[, 2]
-    pred.efsis.consensus.svm <- attr(predict(model.efsis.consensus.svm, test.efsis.consensus.svm, probability = TRUE), 'probabilities')[, 2]
+    pred.efsis.form.sam.geode.svm <- attr(predict(model.efsis.form.sam.geode.svm, test.efsis.form.sam.geode.svm, probability = TRUE), 'probabilities')[, 2]
+    pred.efsis.form.ref.chs.svm <- attr(predict(model.efsis.form.ref.chs.svm, test.efsis.form.ref.chs.svm, probability = TRUE), 'probabilities')[, 2]
+    pred.efsis.form.sam.geode.ref.chs.svm <- attr(predict(model.efsis.form.sam.geode.ref.chs.svm, test.efsis.form.sam.geode.ref.chs.svm, probability = TRUE), 'probabilities')[, 2]
+    pred.efsis.consensus.sam.geode.svm <- attr(predict(model.efsis.consensus.sam.geode.svm, test.efsis.consensus.sam.geode.svm, probability = TRUE), 'probabilities')[, 2]
+    pred.efsis.consensus.ref.chs.svm <- attr(predict(model.efsis.consensus.ref.chs.svm, test.efsis.consensus.ref.chs.svm, probability = TRUE), 'probabilities')[, 2]
+    pred.efsis.consensus.sam.geode.ref.chs.svm <- attr(predict(model.efsis.consensus.sam.geode.ref.chs.svm, test.efsis.consensus.sam.geode.ref.chs.svm, probability = TRUE), 'probabilities')[, 2]
     
     ## Test the classification accuracy using the same test set
     
-    auc.rgife <- auc(y.test, pred.rgife.svm)
+    auc.sam <- auc(y.test, pred.sam.svm)
+    auc.geode <- auc(y.test, pred.geode.svm)
     auc.ref <- auc(y.test, pred.ref.svm)
     auc.chs <- auc(y.test, pred.chs.svm)
-    auc.efsis.form <- auc(y.test, pred.efsis.form.svm)
-    auc.efsis.consensus <- auc(y.test, pred.efsis.consensus.svm)
-    auc.all <- c(auc.rgife, auc.ref, auc.chs, auc.efsis.form, auc.efsis.consensus)
-    write.table(auc.all, paste(path.data, i, 'fold', '-', 'auc.txt', sep = ''), quote = F, col.names = F, row.names = F)
-    
-    # Using ACC
-    ## Train SVM classifiers
-    
-    model.rgife.svm <- svm(formula = factor(y.train)~., data = train.rgife.svm)
-    model.ref.svm <- svm(formula = factor(y.train)~., data = train.ref.svm)
-    model.chs.svm <- svm(formula = factor(y.train)~., data = train.chs.svm)
-    model.efsis.form.svm <- svm(formula = factor(y.train)~., data = train.efsis.form.svm)
-    model.efsis.consensus.svm <- svm(formula = factor(y.train)~., data = train.efsis.consensus.svm)
-    
-    ## Prediction on the test set
-    
-    pred.rgife.svm <- predict(model.rgife.svm, test.rgife.svm)
-    pred.ref.svm <- predict(model.ref.svm, test.ref.svm)
-    pred.chs.svm <- predict(model.chs.svm, test.chs.svm)
-    pred.efsis.form.svm <- predict(model.efsis.form.svm, test.efsis.form.svm)
-    pred.efsis.consensus.svm <- predict(model.efsis.consensus.svm, test.efsis.consensus.svm)
-    
-    pred.rgife.svm.folds <- cbind.all(pred.rgife.svm.folds, pred.ref.svm)
-    pred.ref.svm.folds <- cbind.all(pred.ref.svm.folds, pred.ref.svm)
-    pred.chs.svm.folds <- cbind.all(pred.chs.svm.folds, pred.chs.svm)
-    pred.efsis.form.folds <- cbind.all(pred.efsis.form.folds, pred.efsis.form.svm)
-    pred.efsis.consensus.folds <- cbind.all(pred.efsis.consensus.folds, pred.efsis.consensus.svm)
-    
-    ## Test the classification accuracy using the same test set
-    
+    auc.efsis.form.sam.geode <- auc(y.test, pred.efsis.form.sam.geode.svm)
+    auc.efsis.form.ref.chs <- auc(y.test, pred.efsis.form.ref.chs.svm)
+    auc.efsis.form.sam.geode.ref.chs <- auc(y.test, pred.efsis.form.sam.geode.ref.chs.svm)
+    auc.efsis.consensus.sam.geode <- auc(y.test, pred.efsis.consensus.sam.geode.svm)
+    auc.efsis.consensus.ref.chs <- auc(y.test, pred.efsis.consensus.ref.chs.svm)
+    auc.efsis.consensus.sam.geode.ref.chs <- auc(y.test, pred.efsis.consensus.sam.geode.ref.chs.svm)
+    auc.all <- c(auc.sam, auc.geode, auc.ref, auc.chs, auc.efsis.form.sam.geode, auc.efsis.form.ref.chs, auc.efsis.form.sam.geode.ref.chs, 
+                 auc.efsis.consensus.sam.geode, auc.efsis.consensus.ref.chs, auc.efsis.consensus.sam.geode.ref.chs)
+    auc.all.folds <- cbind.all(auc.all.folds, auc.all)
   }
+  
+  # save the auc for this #-sel-fea to file
+  write.table(auc.all.folds, paste(path.data, 'num', num.sel.fea, '-', 'auc.txt', sep = ''), quote = F, col.names = T, row.names = T)
+  
+  # calculate the stability after 10 folds
+  stab.sam <- stab(sel.fea.sam.folds)
+  stab.geode <- stab(sel.fea.geode.folds)
+  stab.ref <- stab(sel.fea.ref.folds)
+  stab.chs <- stab(y.test, pred.chs.svm)
+  stab.efsis.form.sam.geode <- stab(sel.fea.efsis.form.sam.geode.folds)
+  stab.efsis.form.ref.chs <- stab(sel.fea.efsis.form.ref.chs.folds)
+  stab.efsis.form.sam.geode.ref.chs <- stab(sel.fea.efsis.form.sam.geode.ref.chs.folds)
+  stab.efsis.consensus.sam.geode <- stab(sel.fea.efsis.consensus.sam.geode.folds)
+  stab.efsis.consensus.ref.chs <- stab(sel.fea.efsis.consensus.ref.chs.folds)
+  stab.efsis.consensus.sam.geode.ref.chs <- stab(sel.fea.efsis.consensus.sam.geode.ref.chs.folds)
+  
+  stab.all <- c(stab.sam, stab.geode, stab.ref, stab.chs, stab.efsis.form.sam.geode, stab.efsis.form.ref.chs, stab.efsis.form.sam.geode.ref.chs,
+                stab.efsis.consensus.sam.geode, stab.efsis.consensus.ref.chs, stab.efsis.consensus.sam.geode.ref.chs)
+  # save the stability for this #-sel-fea to file
+  write.table(stab.all, paste(path.data, 'num', num.sel.fea, '-', 'stab.txt', sep = ''), quote = F, col.names = F, row.names = F)
 }
 
 
