@@ -24,14 +24,14 @@ path.data <- '../data/ProstateSingh/'  # path to the data
 data.file <- 'prostate.singh.arff'
 system(paste('cp', '-r', '../rgife/*', path.data))  # the code of RGIFE must be in the same directory as the data
 k.folds <- 10  # k-fold cross validation
-seed <- 12345
+num.round <- 5  # number of rounds of resampling
+seed.10fold <- 12345
 
 # ============ function definition ===========
 
 # define the function of calculating stability
-stab <- function(dataFrame, num.round, num.sel.fea){
+stab <- function(dataFrame){
   num.round <- num.round  # number of resampling rounds
-  num.select.fea <- num.sel.fea
   union <- Reduce(union, dataFrame)  # F in the formula: the list of all features, which have been selected in at least one of n sampling steps
   whole <- unlist(list(dataFrame))  # all the features in List (with replicate)
   sum <- 0
@@ -72,9 +72,10 @@ efsis <- function(){
   
   ## score the features based on each round of resampling
   
-  seed <- 1234
+  seed.resample <- 1234
   for (i in c(1:num.round)){
-    seed <- seed + 1
+    seed.resample <- seed.resample + 1
+    set.seed(seed.resample)
     id.train.resample <- c(sample(which(label.train == levels(label.train)[1]), num.resample.control), sample(which(label.train == levels(label.train)[2]), num.resample.treat))
     x.train.resample <- x.train[, id.train.resample]
     y.train.resample <- y.train[id.train.resample]
@@ -108,8 +109,8 @@ efsis <- function(){
   
   # =============== Stability Calculation ===============
   
-  stab.ref <- stab(fea.top.ref, num.round, num.sel.fea)
-  stab.chs <- stab(fea.top.chs, num.round, num.sel.fea)
+  stab.ref <- stab(fea.top.ref)
+  stab.chs <- stab(fea.top.chs)
   
   # =============== Sub-Final Score Calculation ===============
   ## calculate the sub-final score of each feature
@@ -178,7 +179,7 @@ label.control <- levels(labels)[1]
 label.treat <- levels(labels)[2]  # only proper for 2-class classification problem
 index.control <- which(labels == label.control)
 index.treat <- which(labels == label.treat)
-set.seed(seed)
+set.seed(seed.10fold)
 pos.control.train.list <- createFolds(index.control, k.folds, T, T)  # the function gives the position of samples based on the 1st parameter
 pos.treat.train.list <- createFolds(index.treat, k.folds, T, T)
 
@@ -204,7 +205,7 @@ for (i in c(1:k.folds)){
   index.train <- c(index.control[pos.control.train.list[[i]]], index.treat[pos.treat.train.list[[i]]])
   index.train.control <- index.control[pos.control.train.list[[i]]]
   index.train.treat <- index.treat[pos.treat.train.list[[i]]]
-  index.test <- c(index.control, index.treat)[-index.train]
+  index.test <- setdiff(c(index.control, index.treat), index.train)  # index of all minus index of train gives the index of test
   data.train <- data.raw[index.train, ]  # row -> sample, column -> feature
   data.test <- data.raw[index.test, ]
   
@@ -264,7 +265,6 @@ for (i in c(1:k.folds)){
   
   # =============== Feature Selection using EFSIS ===============
   
-  num.round <- 5  # number of rounds of resampling
   num.resample.control <- ceiling(length(index.train.control) / num.round)  # number of sampled samples in each round
   num.resample.treat <- ceiling(length(index.train.treat) / num.round)
   output.list.efsis <- efsis()
