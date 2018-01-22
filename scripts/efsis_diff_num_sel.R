@@ -17,7 +17,7 @@ library(reshape)
 library(ggplot2)
 
 # ============ Parameters definition ===========
-path.script <- setwd('/export/jonassenfs/xiaokangz/project/EFSIS/scripts')
+path.script <- setwd('./')  # the path to the script
 path.data <- '../data/Leukemia/'  # path to the data
 data.file <- 'leukemia.arff'
 nums.sel.fea <- seq(4, 50, 2)
