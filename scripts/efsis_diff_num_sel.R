@@ -23,7 +23,7 @@ data.file <- 'leukemia.arff'
 nums.sel.fea <- seq(4, 50, 2)
 k.folds <- 10  # k-fold cross validation
 num.round <- 5  # number of rounds of resampling for EFSIS
-seed <- 12345
+seed.10fold <- 12345
 
 # ============ function definition ===========
 
@@ -78,9 +78,10 @@ efsis <- function(){
   
   ## score the features based on each round of resampling
   
-  seed <- 1234
+  seed.resample <- 1234
   for (i in c(1:num.round)){
-    seed <- seed + 1
+    seed.resample <- seed.resample + 1
+    set.seed(seed = seed.resample)
     id.train.resample <- c(sample(which(label.train == levels(label.train)[1]), num.resample.control), sample(which(label.train == levels(label.train)[2]), num.resample.treat))
     x.train.resample <- x.train[, id.train.resample]
     y.train.resample <- y.train[id.train.resample]
@@ -270,7 +271,7 @@ label.control <- levels(labels)[1]
 label.treat <- levels(labels)[2]  # only proper for 2-class classification problem
 index.control <- which(labels == label.control)
 index.treat <- which(labels == label.treat)
-set.seed(seed)
+set.seed(seed = seed.10fold)
 pos.control.train.list <- createFolds(index.control, k.folds, T, T)  # the function gives the position of samples based on the 1st parameter
 pos.treat.train.list <- createFolds(index.treat, k.folds, T, T)
 
@@ -301,7 +302,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     index.train <- c(index.control[pos.control.train.list[[i]]], index.treat[pos.treat.train.list[[i]]])
     index.train.control <- index.control[pos.control.train.list[[i]]]
     index.train.treat <- index.treat[pos.treat.train.list[[i]]]
-    index.test <- c(index.control, index.treat)[-index.train]
+    index.test <- setdiff(c(index.control, index.treat), index.train)
     data.train <- data.raw[index.train, ]  # row -> sample, column -> feature
     data.test <- data.raw[index.test, ]
     
@@ -520,7 +521,7 @@ for (num.sel.fea in c(nums.sel.fea)){
   stab.sam <- stab(sel.fea.sam.folds)
   stab.geode <- stab(sel.fea.geode.folds)
   stab.ref <- stab(sel.fea.ref.folds)
-  stab.chs <- stab(y.test, pred.chs.svm)
+  stab.chs <- stab(sel.fea.chs.folds)
   stab.efsis.form.sam.geode <- stab(sel.fea.efsis.form.sam.geode.folds)
   stab.efsis.form.ref.chs <- stab(sel.fea.efsis.form.ref.chs.folds)
   stab.efsis.form.sam.geode.ref.chs <- stab(sel.fea.efsis.form.sam.geode.ref.chs.folds)
