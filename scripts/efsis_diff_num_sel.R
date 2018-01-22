@@ -57,6 +57,12 @@ efsis <- function(){
   
   # the dataframe collecting all the scores for each feature
   
+  fea.rank.merge.sam <- data.frame(final.rank = rep(0, num.fea))
+  row.names(fea.rank.merge.sam) <- fea.name
+  
+  fea.rank.merge.geode <- data.frame(final.rank = rep(0, num.fea))
+  row.names(fea.rank.merge.geode) <- fea.name
+  
   fea.rank.merge.ref <- data.frame(final.rank = rep(0, num.fea))
   row.names(fea.rank.merge.ref) <- fea.name
   
@@ -65,6 +71,8 @@ efsis <- function(){
   
   # the dataframe collecting the top features for all rounds
   
+  fea.top.sam <- data.frame()
+  fea.top.geode <- data.frame()
   fea.top.ref <- data.frame()
   fea.top.chs <- data.frame()
   
@@ -144,10 +152,10 @@ efsis <- function(){
   
   # =============== Stability Calculation ===============
   
-  stab.sam <- stab(fea.top.sam, num.round, num.sel.fea)
-  stab.geode <- stab(fea.top.geode, num.round, num.sel.fea)
-  stab.ref <- stab(fea.top.ref, num.round, num.sel.fea)
-  stab.chs <- stab(fea.top.chs, num.round, num.sel.fea)
+  stab.sam <- stab(fea.top.sam)
+  stab.geode <- stab(fea.top.geode)
+  stab.ref <- stab(fea.top.ref)
+  stab.chs <- stab(fea.top.chs)
   
   # =============== Sub-Final Score Calculation ===============
   ## calculate the sub-final score of each feature
@@ -268,6 +276,8 @@ pos.treat.train.list <- createFolds(index.treat, k.folds, T, T)
 
 # Loop of different numbers of of selected features
 for (num.sel.fea in c(nums.sel.fea)){
+  print(paste('Start the loop of', num.sel.fea, 'selected features'))
+  
   # =============== k-folds CV scheme ===============
   
   sel.fea.sam.folds <- data.frame()
@@ -372,6 +382,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     
     # =============== Feature Selection using EFSIS ===============
     
+    print('Start selecting features using EFSIS')
     num.resample.control <- ceiling(length(index.train.control) / num.round)  # number of sampled samples in each round
     num.resample.treat <- ceiling(length(index.train.treat) / num.round)
     output.list.efsis <- efsis()
@@ -384,14 +395,18 @@ for (num.sel.fea in c(nums.sel.fea)){
     
     # save the selected features
     
+    sel.fea.sam.folds <- cbind.all(sel.fea.sam.folds, sel.fea.sam)
+    sel.fea.geode.folds <- cbind.all(sel.fea.geode.folds, sel.fea.geode)
     sel.fea.ref.folds <- cbind.all(sel.fea.ref.folds, sel.fea.ref)
     sel.fea.chs.folds <- cbind.all(sel.fea.chs.folds, sel.fea.chs)
-    sel.fea.efsis.form.folds <- cbind.all(sel.fea.efsis.form.folds, sel.fea.efsis.form)
-    sel.fea.efsis.form.folds <- cbind.all(sel.fea.efsis.form.folds, sel.fea.efsis.form)
-    sel.fea.efsis.form.folds <- cbind.all(sel.fea.efsis.form.folds, sel.fea.efsis.form)
-    sel.fea.efsis.consensus.folds <- cbind.all(sel.fea.efsis.consensus.folds, sel.fea.efsis.consensus)
-    sel.fea.efsis.consensus.folds <- cbind.all(sel.fea.efsis.consensus.folds, sel.fea.efsis.consensus)
-    sel.fea.efsis.consensus.folds <- cbind.all(sel.fea.efsis.consensus.folds, sel.fea.efsis.consensus)
+    sel.fea.efsis.form.sam.geode.folds <- cbind.all(sel.fea.efsis.form.sam.geode.folds, sel.fea.efsis.form.sam.geode)
+    sel.fea.efsis.form.ref.chs.folds <- cbind.all(sel.fea.efsis.form.ref.chs.folds, sel.fea.efsis.form.ref.chs)
+    sel.fea.efsis.form.sam.geode.ref.chs.folds <- cbind.all(sel.fea.efsis.form.sam.geode.ref.chs.folds, sel.fea.efsis.form.sam.geode.ref.chs)
+    sel.fea.efsis.consensus.sam.geode.folds <- cbind.all(sel.fea.efsis.consensus.sam.geode.folds, sel.fea.efsis.consensus.sam.geode)
+    sel.fea.efsis.consensus.ref.chs.folds <- cbind.all(sel.fea.efsis.consensus.ref.chs.folds, sel.fea.efsis.consensus.ref.chs)
+    sel.fea.efsis.consensus.sam.geode.ref.chs.folds <- cbind.all(sel.fea.efsis.consensus.sam.geode.ref.chs.folds, sel.fea.efsis.consensus.sam.geode.ref.chs)
+    
+    print('Finished selecting features')
     
     # =============== END of Selecting Features ===============
     
@@ -406,7 +421,9 @@ for (num.sel.fea in c(nums.sel.fea)){
     train.efsis.form.sam.geode <- t(x.train[sel.fea.efsis.form.sam.geode, ])
     train.efsis.form.ref.chs <- t(x.train[sel.fea.efsis.form.ref.chs, ])
     train.efsis.form.sam.geode.ref.chs <- t(x.train[sel.fea.efsis.form.sam.geode.ref.chs, ])
-    train.efsis.consensus <- t(x.train[sel.fea.efsis.consensus, ])
+    train.efsis.consensus.sam.geode <- t(x.train[sel.fea.efsis.consensus.sam.geode, ])
+    train.efsis.consensus.ref.chs <- t(x.train[sel.fea.efsis.consensus.ref.chs, ])
+    train.efsis.consensus.sam.geode.ref.chs <- t(x.train[sel.fea.efsis.consensus.sam.geode.ref.chs, ])
     
     test.sam <- t(x.test[sel.fea.sam, ])
     test.geode <- t(x.test[sel.fea.geode, ])
