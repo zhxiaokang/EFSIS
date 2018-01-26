@@ -1,9 +1,0 @@
-[NID 00572] 2018-01-26 12:37:49 Exec /work/apps/R/3.0.2-dso-gnu/bin/R failed: chdir /home/xzh004/project/EFSIS/scripts No such file or directory
-
-Task and CPU usage stats:
-       JobID    JobName    Account  AllocCPUS    Elapsed      State ExitCode 
------------- ---------- ---------- ---------- ---------- ---------- -------- 
-1903             run.sh                    32   00:00:02    RUNNING      0:0 
-1903.batch        batch                    32   00:00:02    RUNNING      0:0 
-
-Job 1903 completed at Fri Jan 26 12:37:50 CET 2018
