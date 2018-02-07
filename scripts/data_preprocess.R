@@ -36,10 +36,10 @@ breast.df <- cbind(breast.feature.df, breast.class.df)
 write.arff(breast.df, '../data/Breast/breast.arff')
 
 # AML
-aml.raw <- read.table('../data/AML/AMLGSE2191.tab', fill = T)
-aml.clean <- aml.raw[c(1, 4:nrow(aml.raw)), 1:(ncol(aml.raw) - 1)]
-colnames(aml.clean) <- aml.clean[1,]
-aml.clean <- aml.clean[2:nrow(aml.clean),]
+aml.header <- read.table('../data/AML/AMLGSE2191.tab', nrows = 1, header = FALSE, stringsAsFactors = FALSE)
+aml.raw <- read.table('../data/AML/AMLGSE2191.tab', fill = T, skip = 3, header = FALSE)
+colnames(aml.raw) <- unlist(aml.header)
+aml.clean <- aml.raw[, -ncol(aml.raw)]
 write.arff(aml.clean, '../data/AML/aml.arff')
 
 
