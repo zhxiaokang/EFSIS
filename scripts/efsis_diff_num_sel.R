@@ -273,6 +273,7 @@ index.control <- which(labels == label.control)
 index.treat <- which(labels == label.treat)
 set.seed(seed = seed.10fold)
 pos.control.train.list <- createFolds(index.control, k.folds, T, T)  # the function gives the position of samples based on the 1st parameter
+set.seed(seed = seed.10fold)
 pos.treat.train.list <- createFolds(index.treat, k.folds, T, T)
 
 # Loop of different numbers of of selected features
