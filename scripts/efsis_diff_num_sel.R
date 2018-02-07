@@ -20,7 +20,7 @@ library(ggplot2)
 path.script <- setwd('./')  # the path to the script
 path.data <- '../data/Leukemia/'  # path to the data
 data.file <- 'leukemia.arff'
-nums.sel.fea <- seq(36, 50, 2)
+nums.sel.fea <- seq(4, 50, 2)
 k.folds <- 10  # k-fold cross validation
 num.round <- 5  # number of rounds of resampling for EFSIS
 seed.10fold <- 12345
