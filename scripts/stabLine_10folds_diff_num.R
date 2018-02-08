@@ -2,6 +2,7 @@
 
 library(reshape2)
 library(ggplot2)
+library(scmamp)
 
 cbind.all <- function(...){
   nm <- list(...) 
@@ -20,7 +21,7 @@ stabs <- matrix(nrow = length(nums.sel.fea), ncol = length(names.methods))
 j <- 0
 for (i in nums.sel.fea) {
   j = j + 1
-  file.name <- paste('../data/ProstateSingh/num', i, '-stab.txt', sep = '')
+  file.name <- paste('../data/DLBCL/num', i, '-stab.txt', sep = '')
   stab <- read.table(file.name)  # read the file
   stabs[j, ] <- unlist(stab)
 }
@@ -31,6 +32,11 @@ df.stabs$num.sel.fea <- nums.sel.fea
 stabs.long <- melt(df.stabs, id = 'num.sel.fea')
 ggplot(data = stabs.long, aes(x = num.sel.fea, y = value, linetype = variable, colour = variable)) + geom_line() 
 
+# get the average performance
+ranks.stabs <- df.stabs
+for (i in c(1:nrow(df.stabs))){
+  ranks.stabs[i, ] <- rank(-df.stabs[i, ])
+}
+ranks.stabs.ave <- colMeans(ranks.stabs)
 
- 
-
+friedmanPost(ranks.stabs)
