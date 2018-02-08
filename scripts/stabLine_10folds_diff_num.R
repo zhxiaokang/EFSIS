@@ -39,4 +39,14 @@ for (i in c(1:nrow(df.stabs))){
 }
 ranks.stabs.ave <- colMeans(ranks.stabs)
 
+# Friedman test
 friedmanPost(ranks.stabs)
+
+# TurkeyHSD test
+df.stabs <- as.data.frame.matrix(stabs)
+colnames(df.stabs) <- names.methods
+df.stabs <- as.data.frame(t(df.stabs))
+df.stabs$method <- rownames(df.stabs)
+df.stabs.melt <- melt(df.stabs, id.vars = 'method')
+aov.stabs <- aov(df.stabs.melt$value ~ df.stabs.melt$method + df.stabs.melt$variable)
+posthoc.stabs <- TukeyHSD(x=aov.stabs, 'df.stabs.melt$method', conf.level=0.95)
