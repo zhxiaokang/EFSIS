@@ -12,11 +12,11 @@ cbind.all <- function(...){
 }
 
 num.folds <- 10
-nums.sel.fea <- seq(4, 36, 2)  # the numbers of selected features
+nums.sel.fea <- seq(4, 50, 2)  # the numbers of selected features
 df.merge <- data.frame()  # to record the final merged dataframe
-
+dataset <- 'ProstateSingh'
 for (i in nums.sel.fea) {
-  file.name <- paste('../data/Leukemia/num', i, '-auc.txt', sep = '')
+  file.name <- paste('../data/', dataset, '/num', i, '-auc.txt', sep = '')
   df <- read.table(file.name)  # read the file
   # set the row names as one column
   df$method <- row.names(df)
@@ -31,10 +31,33 @@ colnames(df.merge) <- nums.sel.fea
 df.merge <- as.data.frame(df.merge)
 df.merge$method <- c(rep(methods, num.folds))
 df.melt <- melt(df.merge, id.vars = 'method')
+df.melt$method <- factor(df.melt$method, levels = methods)
 
 # ggplot(data = df.melt, aes(x=variable, y=value)) + geom_boxplot(aes(fill=method))
 
-p <- ggplot(data = df.melt, aes(x=variable, y=value)) + 
+p1 <- ggplot(data = df.melt, aes(x=variable, y=value)) + 
   geom_boxplot(aes(fill=method))
-p + facet_wrap( ~ variable, scales="free")
+p1 + facet_wrap( ~ variable, scales="free")
+
+# get the average rankings (averaging on 10 folds)
+rank.method <- data.frame(matrix(NA, nrow = length(methods), ncol = num.folds))
+rownames(rank.method) <- methods
+count <- 0
+for (i in nums.sel.fea) {
+  count <- count + 1
+  file.name <- paste('../data/', dataset, '/num', i, '-auc.txt', sep = '')
+  df <- read.table(file.name)  # read the file
+  df.rank <- df
+  for (j in ncol(df)){
+    df.rank[, j] <- rank(-df[, j])
+  }
+  rank.method[, count] <- rowMeans(df.rank)
+  names(rank.method)[count] <- paste(i, '_features')
+}
+rank.method.df <- as.data.frame(t(rank.method))
+rank.method.df$num_sel_fea <- nums.sel.fea
+rank.method.melt <- melt(rank.method.df, id.vars = 'num_sel_fea')
+p2 <- ggplot(data = rank.method.melt, aes(num_sel_fea, y=value, linetype = variable, colour = variable)) + geom_line()
+# print(p2)
+
 
