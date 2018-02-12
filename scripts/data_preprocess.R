@@ -42,6 +42,13 @@ colnames(aml.raw) <- unlist(aml.header)
 aml.clean <- aml.raw[, -ncol(aml.raw)]
 write.arff(aml.clean, '../data/AML/aml.arff')
 
+# ColonBreast
+colonbreast.header <- read.table('../data/ColonBreast/BC_CCGSE3726_frozen.txt', nrows = 1, sep = '\t', header = FALSE, stringsAsFactors = FALSE)
+colonbreast.raw <- read.table('../data/ColonBreast/BC_CCGSE3726_frozen.txt', sep = '\t', fill = T, skip = 3, header = FALSE)
+colnames(colonbreast.raw) <- unlist(colonbreast.header)
+colonbreast.clean <- colonbreast.raw[, -ncol(colonbreast.raw)]
+write.arff(colonbreast.clean, '../data/ColonBreast/colonbreast.arff')
+
 
 #
 
