@@ -14,7 +14,7 @@ cbind.all <- function(...){
 num.folds <- 10
 nums.sel.fea <- seq(4, 50, 2)  # the numbers of selected features
 df.merge <- data.frame()  # to record the final merged dataframe
-dataset <- 'ProstateSingh'
+dataset <- 'AML'
 for (i in nums.sel.fea) {
   file.name <- paste('../data/', dataset, '/num', i, '-auc.txt', sep = '')
   df <- read.table(file.name)  # read the file

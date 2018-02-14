@@ -13,7 +13,7 @@ cbind.all <- function(...){
 }
 
 num.folds <- 10
-nums.sel.fea <- seq(4, 36, 2)  # the numbers of selected features
+nums.sel.fea <- seq(4, 50, 2)  # the numbers of selected features
 df.merge <- data.frame()  # to record the final merged dataframe
 names.methods <- c('sam', 'geode', 'ref', 'chs', 'form_sam-geode', 'form_ref-chs', 'form_sam-geode-ref-chs', 
                   'consensus_sam-geode', 'consensus_ref_chs', 'consensus_sam-geode-ref-chs')
@@ -21,7 +21,7 @@ stabs <- matrix(nrow = length(nums.sel.fea), ncol = length(names.methods))
 j <- 0
 for (i in nums.sel.fea) {
   j = j + 1
-  file.name <- paste('../data/DLBCL/num', i, '-stab.txt', sep = '')
+  file.name <- paste('../data/AML/num', i, '-stab.txt', sep = '')
   stab <- read.table(file.name)  # read the file
   stabs[j, ] <- unlist(stab)
 }
