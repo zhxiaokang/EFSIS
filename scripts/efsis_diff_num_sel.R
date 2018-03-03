@@ -18,8 +18,8 @@ library(ggplot2)
 
 # ============ Parameters definition ===========
 path.script <- setwd('./')  # the path to the script
-path.data <- '../data/Leukemia/'  # path to the data
-data.file <- 'leukemia.arff'
+path.data <- '../data/Breast/'  # path to the data
+data.file <- 'breast.arff'
 nums.sel.fea <- seq(4, 50, 2)
 k.folds <- 10  # k-fold cross validation
 num.round <- 5  # number of rounds of resampling for EFSIS
