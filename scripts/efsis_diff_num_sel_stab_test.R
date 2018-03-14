@@ -110,6 +110,7 @@ efsis <- function(){
     row.names(fea.rank.merge.sam) <- fea.rank.merge.sam$Row.names
     fea.rank.merge.sam <- fea.rank.merge.sam[, -1]
     
+    
     # use GeoDE to rank the features
     gammas <- 1
     data.geode <- data.frame(fea.name, x.train.resample)
