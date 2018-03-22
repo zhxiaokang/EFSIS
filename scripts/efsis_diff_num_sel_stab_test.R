@@ -238,15 +238,15 @@ efsis <- function(){
   rank.list.chs <- row.names(fea.rank.merge.chs[order(fea.rank.merge.chs[, 'final.rank']), ])
   # integrage SAM, GeoDE
   rank.matrix.sam.geode <- rbind(rank.list.sam, rank.list.geode)
-  rank.list.efsis.sam.geode <- RankAggreg(rank.matrix.sam.geode, num.sel.fea, NULL, method = 'GA', importance = c(stab.sam, stab.geode))
+  invisible(capture.output(rank.list.efsis.sam.geode <- RankAggreg(rank.matrix.sam.geode, num.sel.fea, NULL, method = 'GA', importance = c(stab.sam, stab.geode))))
   sel.fea.efsis.consensus.sam.geode <- rank.list.efsis.sam.geode$top.list
   # integrage Ref, Chs
   rank.matrix.ref.chs <- rbind(rank.list.ref, rank.list.chs)
-  rank.list.efsis.ref.chs <- RankAggreg(rank.matrix.ref.chs, num.sel.fea, NULL, method = 'GA', importance = c(stab.ref, stab.chs))
+  invisible(capture.output(rank.list.efsis.ref.chs <- RankAggreg(rank.matrix.ref.chs, num.sel.fea, NULL, method = 'GA', importance = c(stab.ref, stab.chs))))
   sel.fea.efsis.consensus.ref.chs <- rank.list.efsis.ref.chs$top.list
   # integrage SAM, GeoDE, Ref, Chs
   rank.matrix.sam.geode.ref.chs <- rbind(rank.list.sam, rank.list.geode, rank.list.ref, rank.list.chs)
-  rank.list.efsis.sam.geode.ref.chs <- RankAggreg(rank.matrix.sam.geode.ref.chs, num.sel.fea, NULL, method = 'GA', importance = c(stab.sam, stab.geode, stab.ref, stab.chs))
+  invisible(capture.output(rank.list.efsis.sam.geode.ref.chs <- RankAggreg(rank.matrix.sam.geode.ref.chs, num.sel.fea, NULL, method = 'GA', importance = c(stab.sam, stab.geode, stab.ref, stab.chs))))
   sel.fea.efsis.consensus.sam.geode.ref.chs <- rank.list.efsis.sam.geode.ref.chs$top.list
   
   # =============== END of Selecting Features using efsis ===============
