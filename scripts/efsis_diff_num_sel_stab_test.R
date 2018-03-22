@@ -210,15 +210,15 @@ efsis <- function(){
   
   for (line in c(1:num.fea)){
     # integrage SAM, GeoDE
-    fea.rank.merge.efsis$final.rank.sam.geode[line] <- (1 - stab.ref^(2)) * fea.rank.merge.sam$final.rank[line] + 
-      (1 - stab.chs^(2)) * fea.rank.merge.geode$final.rank[line]
+    fea.rank.merge.efsis$final.rank.sam.geode[line] <- (fea.rank.merge.sam$final.rank[line])^(1 - stab.ref) * 
+      (fea.rank.merge.geode$final.rank[line])^(1 - stab.chs)
     # integrage Ref, Chs
-    fea.rank.merge.efsis$final.rank.ref.chs[line] <- (1 - stab.ref^(2)) * fea.rank.merge.ref$final.rank[line] + 
-      (1 - stab.chs^(2)) * fea.rank.merge.chs$final.rank[line]
+    fea.rank.merge.efsis$final.rank.ref.chs[line] <- (fea.rank.merge.ref$final.rank[line])^(1 - stab.ref) * 
+      (fea.rank.merge.chs$final.rank[line])^(1 - stab.chs)
     # integrage SAM, GeoDE, Ref, Chs
-    fea.rank.merge.efsis$final.rank.sam.geode.ref.chs[line] <- (1 - stab.ref^(2)) * fea.rank.merge.sam$final.rank[line] + 
-      (1 - stab.chs^(2)) * fea.rank.merge.geode$final.rank[line] + (1 - stab.ref^(2)) * fea.rank.merge.ref$final.rank[line] + 
-      (1 - stab.chs^(2)) * fea.rank.merge.chs$final.rank[line]
+    fea.rank.merge.efsis$final.rank.sam.geode.ref.chs[line] <- (fea.rank.merge.sam$final.rank[line])^(1 - stab.ref) * 
+      (fea.rank.merge.geode$final.rank[line])^(1 - stab.chs) * (fea.rank.merge.ref$final.rank[line])^(1 - stab.ref) * 
+      (fea.rank.merge.chs$final.rank[line])^(1 - stab.chs)
   }
   ## Pick top features as feature subset
   # integrage SAM, GeoDE
