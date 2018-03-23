@@ -210,14 +210,14 @@ efsis <- function(){
   
   for (line in c(1:num.fea)){
     # integrage SAM, GeoDE
-    fea.rank.merge.efsis$final.rank.sam.geode[line] <- (fea.rank.merge.sam$final.rank[line])^(1 - stab.ref) * 
-      (fea.rank.merge.geode$final.rank[line])^(1 - stab.chs)
+    fea.rank.merge.efsis$final.rank.sam.geode[line] <- (fea.rank.merge.sam$final.rank[line])^(1 - stab.sam) * 
+      (fea.rank.merge.geode$final.rank[line])^(1 - stab.geode)
     # integrage Ref, Chs
     fea.rank.merge.efsis$final.rank.ref.chs[line] <- (fea.rank.merge.ref$final.rank[line])^(1 - stab.ref) * 
       (fea.rank.merge.chs$final.rank[line])^(1 - stab.chs)
     # integrage SAM, GeoDE, Ref, Chs
-    fea.rank.merge.efsis$final.rank.sam.geode.ref.chs[line] <- (fea.rank.merge.sam$final.rank[line])^(1 - stab.ref) * 
-      (fea.rank.merge.geode$final.rank[line])^(1 - stab.chs) * (fea.rank.merge.ref$final.rank[line])^(1 - stab.ref) * 
+    fea.rank.merge.efsis$final.rank.sam.geode.ref.chs[line] <- (fea.rank.merge.sam$final.rank[line])^(1 - stab.sam) * 
+      (fea.rank.merge.geode$final.rank[line])^(1 - stab.geode) * (fea.rank.merge.ref$final.rank[line])^(1 - stab.ref) * 
       (fea.rank.merge.chs$final.rank[line])^(1 - stab.chs)
   }
   ## Pick top features as feature subset
@@ -337,7 +337,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     
     # =============== Feature Selection using SAM ===============
     
-    print('Start selecting features using SAM')
+    # print('Start selecting features using SAM')
     label.geode <- factor(y.train)
     levels(label.geode) <- c('1', '2')
     data.sam <- list(x=x.train, y=factor(label.geode), genenames=paste("gene",as.character(fea.name),sep=""), geneid=as.character(fea.name), logged2=TRUE)  
@@ -358,7 +358,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     
     # =============== Feature Selection using GeoDE ===============
     
-    print('Start selecting features using GeoDE')
+    # print('Start selecting features using GeoDE')
     gammas <- 1
     data.geode <- data.frame(fea.name, x.train)
     label.geode <- factor(y.train)
@@ -369,7 +369,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     
     # =============== Feature Selection using ReliefF ===============
     
-    print('Start selecting features using ReliefF')
+    # print('Start selecting features using ReliefF')
     data.ref <- data.frame(t(x.train), y.train, check.names = F)  # add the param to avoid changing '-' to '.'
     estReliefF <- attrEval('y.train', data.ref, estimator = 'ReliefFexpRank', ReliefIterations = 30)
     names(estReliefF) <- fea.name  # It's very annoying that 'attrEval' will change the '-' in the names to '.'
@@ -378,7 +378,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     
     # =============== Feature Selection using Chi-Squared ===============
     
-    print('Start selecting features using Chi-Squared')
+    # print('Start selecting features using Chi-Squared')
     data.chs <- data.frame(t(x.train), y.train, check.names = F)
     weights <- chi.squared(y.train~., data.chs)
     fea.rank.chs <- weights[order(weights$attr_importance, decreasing = T), , drop = F]
@@ -386,7 +386,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     
     # =============== Feature Selection using EFSIS ===============
     
-    print('Start selecting features using EFSIS')
+    # print('Start selecting features using EFSIS')
     num.resample.control <- ceiling(length(index.train.control) / num.round)  # number of sampled samples in each round
     num.resample.treat <- ceiling(length(index.train.treat) / num.round)
     output.list.efsis <- efsis()
@@ -414,7 +414,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     sel.fea.efsis.consensus.ref.chs.folds <- cbind.all(sel.fea.efsis.consensus.ref.chs.folds, sel.fea.efsis.consensus.ref.chs)
     sel.fea.efsis.consensus.sam.geode.ref.chs.folds <- cbind.all(sel.fea.efsis.consensus.sam.geode.ref.chs.folds, sel.fea.efsis.consensus.sam.geode.ref.chs)
     
-    print('Finished selecting features')
+    # print('Finished selecting features')
     
     # =============== END of Selecting Features ===============
     
