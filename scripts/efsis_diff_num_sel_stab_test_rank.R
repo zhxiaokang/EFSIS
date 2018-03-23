@@ -546,7 +546,7 @@ for (num.sel.fea in c(nums.sel.fea)){
   }
   
   # save the auc for this #-sel-fea to file
-  write.table(auc.all.folds, paste(path.data, 'num', num.sel.fea, '-', 'auc-stab10.txt', sep = ''), quote = F, col.names = T, row.names = T)
+  write.table(auc.all.folds, paste(path.data, 'num', num.sel.fea, '-', 'auc-stab10-rank.txt', sep = ''), quote = F, col.names = T, row.names = T)
   
   # calculate the stability after 10 folds
   stab.sam <- stab(sel.fea.sam.folds)
@@ -563,7 +563,7 @@ for (num.sel.fea in c(nums.sel.fea)){
   stab.all <- c(stab.sam, stab.geode, stab.ref, stab.chs, stab.efsis.form.sam.geode, stab.efsis.form.ref.chs, stab.efsis.form.sam.geode.ref.chs,
                 stab.efsis.consensus.sam.geode, stab.efsis.consensus.ref.chs, stab.efsis.consensus.sam.geode.ref.chs)
   # save the stability for this #-sel-fea to file
-  write.table(stab.all, paste(path.data, 'num', num.sel.fea, '-', 'stab-stab10.txt', sep = ''), quote = F, col.names = F, row.names = F)
+  write.table(stab.all, paste(path.data, 'num', num.sel.fea, '-', 'stab-stab10-rank.txt', sep = ''), quote = F, col.names = F, row.names = F)
 }
 
 
