@@ -250,21 +250,21 @@ efsis <- function(){
   rank.list.ref <- row.names(fea.rank.merge.ref[order(fea.rank.merge.ref[, 'final.rank']), ])
   rank.list.chs <- row.names(fea.rank.merge.chs[order(fea.rank.merge.chs[, 'final.rank']), ])
   # integrage SAM, GeoDE
-  rank.stab <- rank(c(stab.sam, stab.geode))
+  rank.stab <- rank(c(stab.sam, stab.geode))  ## different from rank in formular, since will be used as importance here, the higher stab -- the higher importance
   rank.stab.sam <- rank.stab[1]
   rank.stab.geode <- rank.stab[2]
   rank.matrix.sam.geode <- rbind(rank.list.sam, rank.list.geode)
   invisible(capture.output(rank.list.efsis.sam.geode <- RankAggreg(rank.matrix.sam.geode, num.sel.fea, NULL, method = 'GA', importance = c(rank.stab.sam, rank.stab.geode))))
   sel.fea.efsis.consensus.sam.geode <- rank.list.efsis.sam.geode$top.list
   # integrage Ref, Chs
-  rank.stab <- rank(-c(stab.ref, stab.chs))
+  rank.stab <- rank(c(stab.ref, stab.chs))
   rank.stab.ref <- rank.stab[1]
   rank.stab.chs <- rank.stab[2]
   rank.matrix.ref.chs <- rbind(rank.list.ref, rank.list.chs)
   invisible(capture.output(rank.list.efsis.ref.chs <- RankAggreg(rank.matrix.ref.chs, num.sel.fea, NULL, method = 'GA', importance = c(rank.stab.ref, rank.stab.chs))))
   sel.fea.efsis.consensus.ref.chs <- rank.list.efsis.ref.chs$top.list
   # integrage SAM, GeoDE, Ref, Chs
-  rank.stab <- rank(-c(stab.sam, stab.geode, stab.ref, stab.chs))
+  rank.stab <- rank(c(stab.sam, stab.geode, stab.ref, stab.chs))
   rank.stab.sam <- rank.stab[1]
   rank.stab.geode <- rank.stab[2]
   rank.stab.ref <- rank.stab[3]
