@@ -55,19 +55,6 @@ for (num.sel.fea in c(nums.sel.fea)){
   
   # =============== k-folds CV scheme ===============
   
-  sel.fea.sam.folds <- data.frame()
-  sel.fea.geode.folds <- data.frame()
-  sel.fea.ref.folds <- data.frame()
-  sel.fea.chs.folds <- data.frame()
-  sel.fea.efsis.form.sam.geode.folds <- data.frame()
-  sel.fea.efsis.form.ref.chs.folds <- data.frame()
-  sel.fea.efsis.form.sam.geode.ref.chs.folds <- data.frame()
-  sel.fea.efsis.consensus.sam.geode.folds <- data.frame()
-  sel.fea.efsis.consensus.ref.chs.folds <- data.frame()
-  sel.fea.efsis.consensus.sam.geode.ref.chs.folds <- data.frame()
-  
-  auc.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'chs', 'form_sam-geode', 'form_ref-chs', 'form_sam-geode-ref-chs', 
-                                            'consensus_sam-geode', 'consensus_ref-chs', 'consensus_sam-geode-ref-chs'))
   time.sam.sel <- c()
   time.geode.sel <- c()
   time.ref.sel <- c()
@@ -84,12 +71,6 @@ for (num.sel.fea in c(nums.sel.fea)){
     index.test <- setdiff(c(index.control, index.treat), index.train)
     data.train <- data.raw[index.train, ]  # row -> sample, column -> feature
     data.test <- data.raw[index.test, ]
-    
-    #     # save the data
-    #     data.train.file.name <- paste(i, 'fold', '-', 'train', '-', data.file, sep = '')
-    #     data.test.file.name <- paste(i, 'fold', '-', 'test', '-', data.file, sep = '')
-    #     write.arff(data.train, paste(path.data, data.train.file.name, sep = ''))
-    #     write.arff(data.test, paste(path.data, data.test.file.name, sep = ''))
     
     fea.name <- colnames(data.train[1:num.fea])
     label.train <- data.train[, pos.label]
@@ -163,7 +144,8 @@ for (num.sel.fea in c(nums.sel.fea)){
     estReliefF <- attrEval('y.train', data.ref, estimator = 'ReliefFexpRank', ReliefIterations = 30)
     names(estReliefF) <- fea.name  # It's very annoying that 'attrEval' will change the '-' in the names to '.'
     fea.rank.ref <- estReliefF[order(abs(estReliefF), decreasing = T)]
-    sel.fea.ref <- names(fea.rank.ref[1:num.sel.fea])
+    fea.rank.name.ref <- names(fea.rank.ref)
+    sel.fea.ref <- fea.rank.name.ref[1:num.sel.fea]
     end.time <- proc.time()
     time.taken <- end.time - start.time
 #     cat('Time taken by ReliefF:', '\n')
@@ -176,7 +158,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     start.time <- proc.time()
     data.chs <- data.frame(t(x.train), y.train, check.names = F)
     weights <- chi.squared(y.train~., data.chs)
-    fea.rank.chs <- weights[order(weights$attr_importance, decreasing = T), , drop = F]
+    fea.rank.chs <- weights.chs[order(weights.chs$attr_importance, decreasing = T), , drop = F]
     sel.fea.chs <- row.names(fea.rank.chs[1:num.sel.fea, , drop = F])
     end.time <- proc.time()
     time.taken <- end.time - start.time
@@ -190,11 +172,12 @@ for (num.sel.fea in c(nums.sel.fea)){
     start.time <- proc.time()
     data.ig <- data.frame(t(x.train), y.train, check.names = F)
     weights <- information_gain(y.train~., data.ig)
-    fea.rank.ig <- weights[order(weights$attr_importance, decreasing = T), , drop = F]
-    sel.fea.ig <- row.names(fea.rank.ig[1:num.sel.fea, , drop = F])
+    fea.rank.ig <- weights[order(weights$importance, decreasing = T), , drop = F]
+    fea.rank.name.ig <- fea.rank.ig$attributes
+    sel.fea.ig <- fea.rank.name.ig[1:num.sel.fea]
     end.time <- proc.time()
     time.taken <- end.time - start.time
-    #     cat('Time taken by Chi-Squared:', '\n')
+    #     cat('Time taken by Information Gain:', '\n')
     #     cat(time.taken[1], '\n')
     time.ig.sel <- c(time.ig.sel, time.taken[1])
   }
@@ -204,18 +187,4 @@ for (num.sel.fea in c(nums.sel.fea)){
   time.chs[paste(num.sel.fea, '_features', ssep = '')] <- time.chs.sel
   time.ig[paste(num.sel.fea, '_features', ssep = '')] <- time.ig.sel
 }
-    
-#     # =============== Feature Selection using Chi-Squared ===============
-#     
-#     # print('Start selecting features using Chi-Squared')
-#     start.time <- Sys.time()
-#     data.chs <- data.frame(t(x.train), y.train, check.names = F)
-#     weights <- chi.squared(y.train~., data.chs)
-#     fea.rank.chs <- weights[order(weights$attr_importance, decreasing = T), , drop = F]
-#     sel.fea.chs <- row.names(fea.rank.chs[1:num.sel.fea, , drop = F])
-#     end.time <- Sys.time()
-#     time.taken <- end.time - start.time
-#     print('Time taken by Chi-Squared:')
-#     time.taken
-#     print(paste('Time taken by Chi-Squared:', time.taken))
 
