@@ -21,7 +21,7 @@ library(ggplot2)
 path.script <- setwd('./')  # the path to the script
 path.data <- '../data/CNS/'  # path to the data
 data.file <- 'cns.arff'
-nums.sel.fea <- seq(4, 10, 4)
+percent.sel.fea <- c(0.1, 0.2, 0.4, 0.7, 1, 1.5, 2, 3, 4, 5) / 100
 k.folds <- 10  # k-fold cross validation
 num.round <- 50  # number of rounds of resampling for EFSIS
 seed.10fold <- 12345
@@ -239,6 +239,7 @@ data.raw <- read.arff(paste(path.data, data.file, sep = ''))  # row -> sample, c
 # Get the general information about this dataset
 num.sample <- nrow(data.raw)  # number of samples
 num.fea <- ncol(data.raw) - 1  # number of features, but notice that the last column is the label
+nums.sel.fea <- ceiling(num.fea * percent.sel.fea)
 pos.label <- num.fea + 1  # the position of the label marked in the dataset
 fea.name <- colnames(data.raw[1:num.fea])
 
@@ -279,7 +280,6 @@ for (num.sel.fea in c(nums.sel.fea)){
     data.train <- data.raw[index.train, ]  # row -> sample, column -> feature
     data.test <- data.raw[index.test, ]
     
-    fea.name <- colnames(data.train[1:num.fea])
     label.train <- data.train[, pos.label]
     
     # Prepare for the training and test data
