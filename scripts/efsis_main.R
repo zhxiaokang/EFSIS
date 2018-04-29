@@ -267,7 +267,8 @@ for (num.sel.fea in c(nums.sel.fea)){
   sel.fea.func.folds <- data.frame()
   sel.fea.efsis.folds <- data.frame()
   
-  auc.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'form_sam-geode-ref-infog'))
+  auc.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'EFSIS'))
+  time.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'EFSIS'))
   
   for (i in c(1:k.folds)){
     
@@ -302,7 +303,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     start.time.func <- proc.time()  # Starting time for function perturbation (include the time taken by each individual method)
     # =============== Feature Selection using SAM ===============
     
-    print('Start selecting features using SAM')
+    # print('Start selecting features using SAM')
     start.time <- proc.time()
     label.sam <- factor(y.train)
     levels(label.sam) <- c('1', '2')
@@ -322,13 +323,13 @@ for (num.sel.fea in c(nums.sel.fea)){
     }
     sel.fea.sam <- fea.rank.name.sam[1:num.sel.fea]
     end.time <- proc.time()
-    time.taken <- end.time - start.time
-    cat('Time taken by SAM:', '\n')
-    cat(time.taken[1], '\n')
+    time.taken.sam <- end.time - start.time
+#     cat('Time taken by SAM:', '\n')
+#     cat(time.taken[1], '\n')
     
     # =============== Feature Selection using GeoDE ===============
     
-    print('Start selecting features using GeoDE')
+    # print('Start selecting features using GeoDE')
     start.time <- proc.time()
     gammas <- 1
     data.geode <- data.frame(fea.name, x.train)
@@ -338,13 +339,13 @@ for (num.sel.fea in c(nums.sel.fea)){
     fea.rank.name.geode <- names(chdir.analysis$results[[1]])  # the ranked feature list
     sel.fea.geode <- fea.rank.name.geode[1:num.sel.fea]
     end.time <- proc.time()
-    time.taken <- end.time - start.time
-    cat('Time taken by GeoDE:', '\n')
-    cat(time.taken[1], '\n')
+    time.taken.geode <- end.time - start.time
+#     cat('Time taken by GeoDE:', '\n')
+#     cat(time.taken[1], '\n')
     
     # =============== Feature Selection using ReliefF ===============
     
-    print('Start selecting features using ReliefF')
+    # print('Start selecting features using ReliefF')
     start.time <- proc.time()
     data.ref <- data.frame(t(x.train), y.train, check.names = F)  # add the param to avoid changing '-' to '.'
     estReliefF <- attrEval('y.train', data.ref, estimator = 'ReliefFexpRank', ReliefIterations = 30)
@@ -353,13 +354,13 @@ for (num.sel.fea in c(nums.sel.fea)){
     fea.rank.name.ref <- names(fea.rank.ref)
     sel.fea.ref <- fea.rank.name.ref[1:num.sel.fea]
     end.time <- proc.time()
-    time.taken <- end.time - start.time
-    cat('Time taken by ReliefF:', '\n')
-    cat(time.taken[1], '\n')
+    time.taken.ref <- end.time - start.time
+#     cat('Time taken by ReliefF:', '\n')
+#     cat(time.taken[1], '\n')
     
     # =============== Feature Selection using Information Gain ===============
     
-    print('Start selecting features using Information Gain')
+    # print('Start selecting features using Information Gain')
     start.time <- proc.time()
     data.infog <- data.frame(t(x.train), y.train, check.names = F)
     weights <- information_gain(y.train~., data.infog)
@@ -367,12 +368,12 @@ for (num.sel.fea in c(nums.sel.fea)){
     fea.rank.name.infog <- fea.rank.infog$attributes
     sel.fea.infog <- fea.rank.name.infog[1:num.sel.fea]
     end.time <- proc.time()
-    time.taken <- end.time - start.time
-    cat('Time taken by Information Gain:', '\n')
-    cat(time.taken[1], '\n')
+    time.taken.infog <- end.time - start.time
+#     cat('Time taken by Information Gain:', '\n')
+#     cat(time.taken[1], '\n')
     
     # =============== Feature Selection using Function Perturbation ===============
-    print('Start selecting features using Function Perturbation')
+    # print('Start selecting features using Function Perturbation')
     start.time <- start.time.func
     ##  The ranking lists for 4 individual ranking methods
     fea.rank.list.sam <- data.frame(rank.sam = seq(1, num.fea))
@@ -407,22 +408,22 @@ for (num.sel.fea in c(nums.sel.fea)){
     fea.order.func <- fea.rank.merge.func[order(fea.rank.merge.func$final.rank), ]
     sel.fea.func <- row.names(fea.order.func[1:num.sel.fea, ])
     end.time <- proc.time()
-    time.taken <- end.time - start.time
-    cat('Time taken by Function Perturbation:', '\n')
-    cat(time.taken[1], '\n')
+    time.taken.func <- end.time - start.time
+#     cat('Time taken by Function Perturbation:', '\n')
+#     cat(time.taken[1], '\n')
     
     # =============== Feature Selection using EFSIS ===============
     
-    print('Start selecting features using EFSIS')
+    # print('Start selecting features using EFSIS')
     start.time <- proc.time()
     num.resample.control <- ceiling(length(index.train.control) / (num.round/10))  # number of sampled samples in each round
     num.resample.treat <- ceiling(length(index.train.treat) / (num.round/10))
     output.list.efsis <- efsis()
     sel.fea.efsis <- output.list.efsis$sel.fea.efsis
     end.time <- proc.time()
-    time.taken <- end.time - start.time
-    cat('Time taken by EFSIS:', '\n')
-    cat(time.taken[1], '\n')
+    time.taken.efsis <- end.time - start.time
+#     cat('Time taken by EFSIS:', '\n')
+#     cat(time.taken[1], '\n')
     stab.sam <- output.list.efsis$stab.sam
     stab.geode <- output.list.efsis$stab.geode
     stab.ref <- output.list.efsis$stab.ref
@@ -434,7 +435,11 @@ for (num.sel.fea in c(nums.sel.fea)){
     sel.fea.geode.folds <- cbind.all(sel.fea.geode.folds, sel.fea.geode)
     sel.fea.ref.folds <- cbind.all(sel.fea.ref.folds, sel.fea.ref)
     sel.fea.infog.folds <- cbind.all(sel.fea.infog.folds, sel.fea.infog)
+    sel.fea.func.folds <- cbind.all(sel.fea.func.folds, sel.fea.func)
     sel.fea.efsis.folds <- cbind.all(sel.fea.efsis.folds, sel.fea.efsis)
+    
+    time.all <- c(time.taken.sam, time.taken.geode, time.taken.ref, time.taken.infog, time.taken.func, time.taken.efsis)
+    time.all.folds <- cbind.all(time.all.folds, time.all)
     
     print('Finished selecting features')
     
@@ -516,6 +521,9 @@ for (num.sel.fea in c(nums.sel.fea)){
   
   # save the auc for this #-sel-fea to file
   write.table(auc.all.folds, paste(path.data, 'num', num.sel.fea, '-', 'auc-main.txt', sep = ''), quote = F, col.names = T, row.names = T)
+  
+  # save the time for this #-sel-fea to file
+  write.table(time.all.folds, paste(path.data, 'num', num.sel.fea, '-', 'time-main.txt', sep = ''), quote = F, col.names = T, row.names = T)
   
   # calculate the stability after 10 folds
   stab.sam <- stab(sel.fea.sam.folds)
