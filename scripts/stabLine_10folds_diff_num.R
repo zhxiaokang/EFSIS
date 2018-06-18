@@ -16,7 +16,8 @@ cbind.all <- function(...){
 num.folds <- 10
 
 # Load the data
-path.data <- '../data/AML/'  # path to the data
+data.set <- 'AML'
+path.data <- paste('../data/', data.set, '/', sep = '')  # path to the data
 data.file <- list.files(path = path.data, pattern = '.arff')
 data.raw <- read.arff(paste(path.data, data.file, sep = ''))  # row -> sample, column -> feature
 percent.sel.fea <- c(0.1, 0.2, 0.4, 0.7, 1, 1.5, 2, 3, 4, 5) / 100
