@@ -12,11 +12,22 @@ cbind.all <- function(...){
 }
 
 num.folds <- 10
-nums.sel.fea <- seq(4, 50, 2)  # the numbers of selected features
+# Load the data
+data.set <- 'AML'
+path.data <- paste('../data/', data.set, '/', sep = '')  # path to the data
+data.file <- list.files(path = path.data, pattern = '.arff')
+data.raw <- read.arff(paste(path.data, data.file, sep = ''))  # row -> sample, column -> feature
+percent.sel.fea <- c(0.1, 0.2, 0.4, 0.7, 1, 1.5, 2, 3, 4, 5) / 100
+
+# Get the general information about this dataset
+
+num.fea <- ncol(data.raw) - 1  # number of features, but notice that the last column is the label
+nums.sel.fea <- ceiling(num.fea * percent.sel.fea)  # the numbers of selected features
+
 df.merge <- data.frame()  # to record the final merged dataframe
-dataset <- 'AML'
+
 for (i in nums.sel.fea) {
-  file.name <- paste('../data/', dataset, '/num', i, '-auc.txt', sep = '')
+  file.name <- paste('../data/', data.set, '/num', i, '-auc-main-btsp-css.txt', sep = '')
   df <- read.table(file.name)  # read the file
   # set the row names as one column
   df$method <- row.names(df)
@@ -37,7 +48,7 @@ df.melt$method <- factor(df.melt$method, levels = methods)
 
 p1 <- ggplot(data = df.melt, aes(x=variable, y=value)) + 
   geom_boxplot(aes(fill=method))
-p1 + facet_wrap( ~ variable, scales="free")
+p1 <- p1 + facet_wrap( ~ variable, scales="free")
 
 # get the average rankings (averaging on 10 folds)
 rank.method <- data.frame(matrix(NA, nrow = length(methods), ncol = num.folds))
@@ -45,7 +56,7 @@ rownames(rank.method) <- methods
 count <- 0
 for (i in nums.sel.fea) {
   count <- count + 1
-  file.name <- paste('../data/', dataset, '/num', i, '-auc.txt', sep = '')
+  file.name <- paste('../data/', data.set, '/num', i, '-auc-main-btsp-css.txt', sep = '')
   df <- read.table(file.name)  # read the file
   df.rank <- df
   for (j in ncol(df)){
