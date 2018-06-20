@@ -19,8 +19,9 @@ library(ggplot2)
 
 # ============ Parameters definition ===========
 path.script <- setwd('./')  # the path to the script
-path.data <- '../data/AML/'  # path to the data
-data.file <- 'aml.arff'
+data.set <- 'Breast'
+path.data <- paste('../data/', data.set, '/', sep = '')  # path to the data
+data.file <- list.files(path = path.data, pattern = '.arff')
 percent.sel.fea <- c(0.1, 0.2, 0.4, 0.7, 1, 1.5, 2, 3, 4, 5) / 100
 k.folds <- 10  # k-fold cross validation
 num.round <- 50  # number of rounds of resampling for EFSIS
