@@ -49,6 +49,21 @@ colnames(colonbreast.raw) <- unlist(colonbreast.header)
 colonbreast.clean <- colonbreast.raw[, -ncol(colonbreast.raw)]
 write.arff(colonbreast.clean, '../data/ColonBreast/colonbreast.arff')
 
+# ProstateSboner
+file.list <- list.files(path = '../data/ProstateSboner/E-GEOD-16560.processed.1', pattern = '.txt')
+cbind.all <- function(...){
+  nm <- list(...) 
+  nm <- lapply(nm, as.matrix)
+  n <- max(sapply(nm, nrow)) 
+  do.call(cbind, lapply(nm, function (x) 
+    rbind(x, matrix(, n-nrow(x), ncol(x))))) 
+}
+prostate.sboner.feature <- data.frame()
+for (sample in file.list) {
+  expression <- read.table(paste('../data/ProstateSboner/E-GEOD-16560.processed.1/', sample, sep = ''), header = T, row.names = 1, sep = '\t')
+  colnames(expression) <- sample
+  prostate.sboner.feature <- cbind.all(prostate.sboner.feature, expression)
+}
 
-#
+
 
