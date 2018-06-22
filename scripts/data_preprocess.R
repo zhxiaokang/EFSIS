@@ -1,6 +1,14 @@
 # Data preprocess to convert all data into .arff
 
 library(foreign)
+# Define the function to add columns to empty dataframe
+cbind.all <- function(...){
+  nm <- list(...) 
+  nm <- lapply(nm, as.matrix)
+  n <- max(sapply(nm, nrow)) 
+  do.call(cbind, lapply(nm, function (x) 
+    rbind(x, matrix(, n-nrow(x), ncol(x))))) 
+}
 
 # Dlbcl
 dlbcl.raw <- read.table('../data/DLBCL/dlbcl_preprocessed.txt', row.names = 1)
@@ -51,19 +59,16 @@ write.arff(colonbreast.clean, '../data/ColonBreast/colonbreast.arff')
 
 # ProstateSboner
 file.list <- list.files(path = '../data/ProstateSboner/E-GEOD-16560.processed.1', pattern = '.txt')
-cbind.all <- function(...){
-  nm <- list(...) 
-  nm <- lapply(nm, as.matrix)
-  n <- max(sapply(nm, nrow)) 
-  do.call(cbind, lapply(nm, function (x) 
-    rbind(x, matrix(, n-nrow(x), ncol(x))))) 
-}
 prostate.sboner.feature <- data.frame()
 for (sample in file.list) {
   expression <- read.table(paste('../data/ProstateSboner/E-GEOD-16560.processed.1/', sample, sep = ''), header = T, row.names = 1, sep = '\t')
   colnames(expression) <- sample
   prostate.sboner.feature <- cbind.all(prostate.sboner.feature, expression)
 }
-
-
+prostate.sboner.feature <- t(prostate.sboner.feature)
+prostate.sboner.class <- read.table('../data/ProstateSboner/name.label.uniq', header = F, row.names = 1)
+colnames(prostate.sboner.class) <- 'class'
+rownames(prostate.sboner.feature) <- rownames(prostate.sboner.class)
+prostate.sboner <- cbind(prostate.sboner.feature, prostate.sboner.class)
+write.arff(prostate.sboner, '../data/ProstateSboner/prostate.sboner.arff')
 
