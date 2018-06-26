@@ -1,8 +1,8 @@
 # Use paired t-test to check if there are significant differences between ensemble (function perturbation and EFSIS) and best individual (with the highest average AUC among all individuals)
 
-# Function to calculate the variance of each row
-rowVar <- function(x) {
-  return(rowSums((x - rowMeans(x))^2)/(dim(x)[2] - 1))
+# Function to calculate the standard variance of each row
+rowSd <- function(x) {
+  return(apply(x, 1, sd))
 }
 
 # The function to calculate the p-adj for each method compared with the individual method with the highest average AUC
@@ -12,7 +12,7 @@ BestIndv <- function(df, vec){  # df is the dataframe of the auc matrix, vec giv
   pos.max <- which(ave == max(ave))  # the index of the individual method with highest average
   indv.ave.best <- indv[pos.max, ]  # save the values of that method as another variable, may be more than one
   if (length(pos.max) > 1){
-    var <- rowVar(indv.ave.best)
+    var <- rowSd(indv.ave.best)
     pos.min <- which(var == min(var))  # the index of the individual method with min variance
     indv.var.best <- indv.ave.best[pos.min, ]
     if (length(pos.min) > 1){
@@ -43,10 +43,11 @@ names.methods <- c('SAM', 'GeoDE', 'RelifF', 'Information Gain', 'Function Pertu
 vec.indv <- c(1:4)  # the indexes of all the individual methods
 
 auc.mean.list <- data.frame(row.names = names.methods)
-auc.var.list <- data.frame(row.names = names.methods)
+auc.sd.list <- data.frame(row.names = names.methods)
 
 for (i in percent.sel.fea) {
-  method.sig <- c()
+  method.better <- c()
+  method.worse <- c()
   num.sel.fea <- ceiling(num.fea * i)  # the numbers of selected features
   file.name <- paste('../data/', data.set, '/num', num.sel.fea, '-auc-main-btsp-css.txt', sep = '')
   df <- read.table(file.name)  # read the AUC file
@@ -57,16 +58,39 @@ for (i in percent.sel.fea) {
     if (!identical(unlist(indv.best), unlist(auc.competitor))){
       p.value <- t.test(unlist(indv.best), unlist(auc.competitor), paired = T)$p.value
       if (p.value < 0.05){
-        method.sig <- c(method.sig, names.methods[j])
+        if (mean(unlist(indv.best)) < mean(unlist(auc.competitor))) {
+          method.better <- c(method.better, names.methods[j])
+        } else {
+          method.worse <- c(method.worse, names.methods[j])
+        }
       }
     }
   }
-  if (length(method.sig) > 0){
-    print(paste('Percent:', i, 'method:', method.sig))
+  if (length(method.better) + length(method.worse) > 0) {
+    print(paste('Percent:', i))
+    if (length(method.better) > 0) {
+      print(paste('Better method than the best Individual one:', paste(method.better)))
+    }
+    if (length(method.worse) > 0) {
+      print(paste('Worse method than the best Individual one:', paste(method.worse, collapse = ', ')))
+    }
   }
   auc.mean <- rowMeans(df)
-  auc.var <- rowVar(df)
+  auc.sd <- rowSd(df)
   auc.mean.list[as.character(i)] <- auc.mean
-  auc.var.list[as.character(i)] <- auc.var
+  auc.sd.list[as.character(i)] <- auc.sd
 }
+
+num.row <- nrow(auc.mean.list)
+num.col <- ncol(auc.mean.list)
+table <- matrix(nrow = num.row, ncol = num.col)
+for (i in c(1:num.row)){
+  for (j in c(1:num.col)){
+    table[i, j] <- paste(format(round(auc.mean.list[i, j], 2), nsmall = 2), '\u00b1', format(round(auc.sd.list[i, j], 2), nsmall = 2), '\t', collapse = ' ')
+  }
+}
+
+write.table(table, 'mean-sd.txt', quote = F, row.names = F, col.names = F)
+
+
 
