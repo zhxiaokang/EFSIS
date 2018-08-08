@@ -19,7 +19,7 @@ library(ggplot2)
 
 # ============ Parameters definition ===========
 path.script <- setwd('./')  # the path to the script
-data.set <- 'Breast'
+data.set <- 'ProstateSboner'
 path.data <- paste('../data/', data.set, '/', sep = '')  # path to the data
 data.file <- list.files(path = path.data, pattern = '.arff')
 percent.sel.fea <- c(0.1, 0.2, 0.4, 0.7, 1, 1.5, 2, 3, 4, 5) / 100
@@ -255,6 +255,7 @@ efsis <- function(){
 # =============== Data Preparation ===============
 
 # Load the data
+print('Loading the data......')
 data.raw <- read.arff(paste(path.data, data.file, sep = ''))  # row -> sample, column -> feature
 
 # Get the general information about this dataset
@@ -274,6 +275,8 @@ set.seed(seed = seed.10fold)
 pos.control.train.list <- createFolds(index.control, k.folds, T, T)  # the function gives the position of samples based on the 1st parameter
 set.seed(seed = seed.10fold)
 pos.treat.train.list <- createFolds(index.treat, k.folds, T, T)
+
+print('Start working......')
 
 # Loop of different numbers of of selected features
 for (num.sel.fea in c(nums.sel.fea)){
