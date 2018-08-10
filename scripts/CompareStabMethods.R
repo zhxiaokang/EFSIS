@@ -18,6 +18,8 @@ stab1 <- function(dataFrame){
     sum <- sum + freq
   }
   stab.na <- sum / (num.round * length(union))
+  stab.na <- (stab.na - (1/num.round))/(1 - (1/num.round))
+  # stab <- max(0, stab.na - 10 * (num.sel.fea/num.fea))
   return(stab.na)
 }
 
@@ -61,3 +63,4 @@ for (num.sel.fea in seq(10,500,10)){
   stabs1 <- c(stabs1, stab1(df.sel))
   stabs2 <- c(stabs2, stab2(df.sel))
 }
+
