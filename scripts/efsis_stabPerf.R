@@ -5,6 +5,7 @@
 # new updates compared with 'efsis.R': 
 # 1. use StabPerf to calculate stab
 # 2. But normalize stabPerf to [0,1]
+# 3. Use the percents of selected features from paper <Pes B. et al., 2017>
 
 remove(list = ls())
 
@@ -24,7 +25,7 @@ library(ggplot2)
 path.script <- setwd('./')  # the path to the script
 path.data <- '../data/CNS/'  # path to the data
 data.file <- 'cns.arff'
-percent.sel.fea <- c(0.1, 0.2, 0.4, 0.7, 1, 1.5, 2, 3, 4, 5) / 100
+percent.sel.fea <- c(0.3, 0.5, 0.7, 1, 1.5, 2, 3, 4, 5) / 100
 k.folds <- 10  # k-fold cross validation
 num.round <- 50  # number of rounds of resampling for EFSIS
 seed.10fold <- 12345
