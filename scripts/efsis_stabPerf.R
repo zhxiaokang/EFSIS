@@ -548,13 +548,13 @@ for (num.sel.fea in c(nums.sel.fea)){
   # save the selected features for this #-sel-fea to file
   sel.fea.all.folds <- list(sam = sel.fea.sam.folds, geode = sel.fea.geode.folds, ref = sel.fea.ref.folds,
                             infog = sel.fea.infog.folds, func = sel.fea.func.folds, efsis = sel.fea.efsis.folds)
-  save(sel.fea.all.folds, file = paste(path.data, 'num', num.sel.fea, '-', 'sel-fea-efsis.RData', sep = ''))
+  save(sel.fea.all.folds, file = paste(path.data, 'num', num.sel.fea, '-', 'sel-fea-efsis_stabPerf.RData', sep = ''))
   
   # save the auc for this #-sel-fea to file
-  write.table(auc.all.folds, paste(path.data, 'num', num.sel.fea, '-', 'auc-efsis.txt', sep = ''), quote = F, col.names = T, row.names = T)
+  write.table(auc.all.folds, paste(path.data, 'num', num.sel.fea, '-', 'auc-efsis_stabPerf.txt', sep = ''), quote = F, col.names = T, row.names = T)
   
   # save the time for this #-sel-fea to file
-  write.table(time.all.folds, paste(path.data, 'num', num.sel.fea, '-', 'time-efsis.txt', sep = ''), quote = F, col.names = T, row.names = T)
+  write.table(time.all.folds, paste(path.data, 'num', num.sel.fea, '-', 'time-efsis_stabPerf.txt', sep = ''), quote = F, col.names = T, row.names = T)
   
   # calculate the stability after 10 folds
   stab.sam <- stab(sel.fea.sam.folds)
@@ -566,6 +566,6 @@ for (num.sel.fea in c(nums.sel.fea)){
   
   stab.all <- c(stab.sam, stab.geode, stab.ref, stab.infog, stab.func, stab.efsis)
   # save the stability for this #-sel-fea to file
-  write.table(stab.all, paste(path.data, 'num', num.sel.fea, '-', 'stab-efsis.txt', sep = ''), quote = F, col.names = F, row.names = F)
+  write.table(stab.all, paste(path.data, 'num', num.sel.fea, '-', 'stab-efsis_stabPerf.txt', sep = ''), quote = F, col.names = F, row.names = F)
 }
 
