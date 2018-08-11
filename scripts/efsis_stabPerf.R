@@ -6,6 +6,8 @@
 # 1. use StabPerf to calculate stab
 # 2. But normalize stabPerf to [0,1]
 # 3. Use the percents of selected features from paper <Pes B. et al., 2017>
+# 4. save the stab of the individual methods inside EFSIS
+# 5. pass the parameters by command line
 
 remove(list = ls())
 
@@ -23,8 +25,11 @@ library(ggplot2)
 
 # ============ Parameters definition ===========
 path.script <- setwd('./')  # the path to the script
-path.data <- '../data/CNS/'  # path to the data
-data.file <- 'cns.arff'
+args <- commandArgs(TRUE)
+data.set <- args[1]
+path.data <- paste('../data/', data.set, '/', sep = '')  # path to the data
+data.file <- list.files(path = path.data, pattern = '.arff')
+script.version <- args[2]
 percent.sel.fea <- c(0.3, 0.5, 0.7, 1, 1.5, 2, 3, 4, 5) / 100
 k.folds <- 10  # k-fold cross validation
 num.round <- 50  # number of rounds of resampling for EFSIS
@@ -297,6 +302,8 @@ for (num.sel.fea in c(nums.sel.fea)){
   auc.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'EFSIS'))
   time.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'EFSIS'))
   
+  stab.efsis.indv.folds <- data.frame()  # record the stability of the individual methods inside EFSIS
+  
   for (i in c(1:k.folds)){
     
     # =============== Data Preparation ===============
@@ -451,10 +458,13 @@ for (num.sel.fea in c(nums.sel.fea)){
     time.taken.efsis <- end.time - start.time
     #     cat('Time taken by EFSIS:', '\n')
     #     cat(time.taken[1], '\n')
-    stab.sam <- output.list.efsis$stab.sam
-    stab.geode <- output.list.efsis$stab.geode
-    stab.ref <- output.list.efsis$stab.ref
-    stab.infog <- output.list.efsis$stab.infog
+    stab.efsis.sam <- output.list.efsis$stab.sam
+    stab.efsis.geode <- output.list.efsis$stab.geode
+    stab.efsis.ref <- output.list.efsis$stab.ref
+    stab.efsis.infog <- output.list.efsis$stab.infog
+    
+    stab.efsis.indv.folds <- cbind.all(stab.efsis.indv.folds, c(stab.efsis.sam, stab.efsis.geode,
+                                                                stab.efsis.ref, stab.efsis.infog))
     
     # save the selected features
     
@@ -549,13 +559,16 @@ for (num.sel.fea in c(nums.sel.fea)){
   # save the selected features for this #-sel-fea to file
   sel.fea.all.folds <- list(sam = sel.fea.sam.folds, geode = sel.fea.geode.folds, ref = sel.fea.ref.folds,
                             infog = sel.fea.infog.folds, func = sel.fea.func.folds, efsis = sel.fea.efsis.folds)
-  save(sel.fea.all.folds, file = paste(path.data, 'num', num.sel.fea, '-', 'sel-fea-efsis_stabPerf.RData', sep = ''))
+  save(sel.fea.all.folds, file = paste(path.data, 'num', num.sel.fea, '-sel-fea-', script.version, '.RData', sep = ''))
+  
+  # save the stability of the individual methods inside EFSIS
+  write.table(stab.efsis.indv.folds, paste(path.data, 'num', num.sel.fea, '-stab-indv-', script.version, '.txt', sep = ''), quote = F, col.names = T, row.names = T)
   
   # save the auc for this #-sel-fea to file
-  write.table(auc.all.folds, paste(path.data, 'num', num.sel.fea, '-', 'auc-efsis_stabPerf.txt', sep = ''), quote = F, col.names = T, row.names = T)
+  write.table(auc.all.folds, paste(path.data, 'num', num.sel.fea, '-auc-', script.version, '.txt', sep = ''), quote = F, col.names = T, row.names = T)
   
   # save the time for this #-sel-fea to file
-  write.table(time.all.folds, paste(path.data, 'num', num.sel.fea, '-', 'time-efsis_stabPerf.txt', sep = ''), quote = F, col.names = T, row.names = T)
+  write.table(time.all.folds, paste(path.data, 'num', num.sel.fea, '-time-', script.version, '.txt', sep = ''), quote = F, col.names = T, row.names = T)
   
   # calculate the stability after 10 folds
   stab.sam <- stab(sel.fea.sam.folds)
@@ -567,6 +580,6 @@ for (num.sel.fea in c(nums.sel.fea)){
   
   stab.all <- c(stab.sam, stab.geode, stab.ref, stab.infog, stab.func, stab.efsis)
   # save the stability for this #-sel-fea to file
-  write.table(stab.all, paste(path.data, 'num', num.sel.fea, '-', 'stab-efsis_stabPerf.txt', sep = ''), quote = F, col.names = F, row.names = F)
+  write.table(stab.all, paste(path.data, 'num', num.sel.fea, '-stab-', script.version, '.txt', sep = ''), quote = F, col.names = F, row.names = F)
 }
 
