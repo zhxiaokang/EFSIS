@@ -34,7 +34,7 @@ seed.10fold <- 12345
 
 # define the function of calculating stability
 # stab <- function(dataFrame){
-#   num.round <- num.round  # number of resampling rounds
+#   num.round <- ncol(dataFrame)  # number of resampling rounds
 #   union <- Reduce(union, dataFrame)  # F in the formula: the list of all features, which have been selected in at least one of n sampling steps
 #   whole <- unlist(list(dataFrame))  # all the features in List (with replicate)
 #   sum <- 0
