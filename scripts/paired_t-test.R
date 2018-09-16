@@ -1,5 +1,7 @@
 # Use paired t-test to check if there are significant differences between ensemble (function perturbation and EFSIS) and best individual (with the highest average AUC among all individuals)
 
+library(foreign)
+
 # Function to calculate the standard variance of each row
 rowSd <- function(x) {
   return(apply(x, 1, sd))
@@ -27,11 +29,11 @@ BestIndv <- function(df, vec){  # df is the dataframe of the auc matrix, vec giv
 }
 
 # Load the data
-data.set <- 'ProstateSingh'
+data.set <- 'DLBCL'
 path.data <- paste('../data/', data.set, '/', sep = '')  # path to the data
 data.file <- list.files(path = path.data, pattern = '.arff')
 data.raw <- read.arff(paste(path.data, data.file, sep = ''))  # row -> sample, column -> feature
-percent.sel.fea <- c(0.1, 0.2, 0.4, 0.7, 1, 1.5, 2, 3, 4, 5) / 100  # percentages of selected features
+percent.sel.fea <- c(0.3, 0.5, 0.7, 1, 1.5, 2, 3, 4, 5) / 100  # percentages of selected features
 
 # Get the general information about this dataset
 
@@ -39,7 +41,7 @@ num.fea <- ncol(data.raw) - 1  # number of features, but notice that the last co
 # nums.sel.fea <- ceiling(num.fea * percent.sel.fea)  # the numbers of selected features
 
 num.folds <- 10
-names.methods <- c('SAM', 'GeoDE', 'RelifF', 'Information Gain', 'Function Perturbation', 'EFSIS', 'CSS')
+names.methods <- c('SAM', 'GeoDE', 'RelifF', 'Information Gain', 'Function Perturbation', 'EFSIS')
 vec.indv <- c(1:4)  # the indexes of all the individual methods
 
 auc.mean.list <- data.frame(row.names = names.methods)
@@ -49,7 +51,7 @@ for (i in percent.sel.fea) {
   method.better <- c()
   method.worse <- c()
   num.sel.fea <- ceiling(num.fea * i)  # the numbers of selected features
-  file.name <- paste('../data/', data.set, '/num', num.sel.fea, '-auc-main-btsp-css.txt', sep = '')
+  file.name <- paste('../data/', data.set, '/num', num.sel.fea, '-auc-stabPerf.txt', sep = '')
   df <- read.table(file.name)  # read the AUC file
   num.methods <- nrow(df)
   indv.best <- BestIndv(df, vec.indv)
@@ -68,6 +70,7 @@ for (i in percent.sel.fea) {
   }
   if (length(method.better) + length(method.worse) > 0) {
     print(paste('Percent:', i))
+    print(paste('The best individual method:', row.names(indv.best)))
     if (length(method.better) > 0) {
       print(paste('Better method than the best Individual one:', paste(method.better)))
     }
