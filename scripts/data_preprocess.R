@@ -66,9 +66,20 @@ for (sample in file.list) {
   prostate.sboner.feature <- cbind.all(prostate.sboner.feature, expression)
 }
 prostate.sboner.feature <- t(prostate.sboner.feature)
-prostate.sboner.class <- read.table('../data/ProstateSboner/name.label.uniq', header = F, row.names = 1)
+prostate.sboner.class <- read.table('../data/ProstateSboner/name.label.uniq', header = F, row.names = 1, stringsAsFactors = T)
 colnames(prostate.sboner.class) <- 'class'
 rownames(prostate.sboner.feature) <- rownames(prostate.sboner.class)
 prostate.sboner <- cbind(prostate.sboner.feature, prostate.sboner.class)
 write.arff(prostate.sboner, '../data/ProstateSboner/prostate.sboner.arff')
+
+# MLL
+mll.class <- read.table('../data/MLL/mll_preprocessed.txt', row.names = 1, nrows = 1, header = F, stringsAsFactors = T)
+mll.feature <- read.table('../data/MLL/mll_preprocessed.txt', row.names = 1, skip = 1, header = F)
+mll.feature.df <- as.data.frame.matrix(t(mll.feature))
+mll.class.df <- as.data.frame.matrix(t(mll.class))
+mll.df <- cbind(mll.feature.df, mll.class.df)
+write.arff(mll.df, '../data/MLL/mll.arff')
+
+
+
 
