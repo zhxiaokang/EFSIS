@@ -108,7 +108,6 @@ efsis <- function(){
   fea.top.infog <- data.frame()
   
   ## score the features based on each round of resampling
-  
   rounds.btsp <- seq(1, num.round)  # sequence of numbers for bootstrap, used for parallel computing
   seed.resample <- 1234
   boot.strap <- function(round.btsp) {
@@ -143,10 +142,10 @@ efsis <- function(){
     levels(label.geode) <- c('1', '2')  # GeoDE::chdirAnalysis only accepts '1' and '2' as label factors
     chdir.analysis <- chdirAnalysis(data.geode, factor(label.geode), gammas, CalculateSig=FALSE, nnull=10)
     fea.rank.name.geode <- names(chdir.analysis$results[[1]])  # the ranked feature list for this round
-    
+    # print(paste('geode', str(fea.rank.name.geode)))
     # use ReliefF to rank the features
     data.ref <- data.frame(t(x.train.resample), y.train.resample, check.names = F)  # add the param to avoid changing '-' to '.'
-    estReliefF <- attrEval('y.train.resample', data.ref, estimator = 'ReliefFexpRank', ReliefIterations = 30)
+    estReliefF <- attrEval('y.train.resample', data.ref, estimator = 'ReliefFexpRank', ReliefIterations = -2, maxThreads = 1)
     names(estReliefF) <- fea.name  # This command needs to be added because it's very annoying that 'attrEval' will change the '-' in the names to '.'
     fea.rank.ref <- estReliefF[order(abs(estReliefF), decreasing = T)]
     fea.rank.ref <- data.frame(importance = fea.rank.ref)
@@ -157,46 +156,49 @@ efsis <- function(){
     weights <- information_gain(y.train.resample~., data.infog)
     fea.rank.infog <- weights[order(weights$importance, decreasing = T), , drop = F]
     fea.rank.name.infog <- fea.rank.infog$attributes  # the ranked feature list for this round
-    
+    # print(paste('infog', str(fea.rank.name.infog)))
     return(list(fea.rank.name.sam, fea.rank.name.geode, fea.rank.name.ref, fea.rank.name.infog))
   }
   
   results.btsp <- mclapply(rounds.btsp, boot.strap, mc.cores = num.round)
   
   for (i in c(1:num.round)){
-    # extract the outputs from each btsp
     fea.rank.name.sam <- results.btsp[[i]][[1]]
+    # print(paste('sam', str(fea.rank.name.sam)))
     fea.rank.name.geode <- results.btsp[[i]][[2]]
+    # print(paste('geode', str(fea.rank.name.geode)))
     fea.rank.name.ref <- results.btsp[[i]][[3]]
+    # print(paste('ref', str(fea.rank.name.ref)))
     fea.rank.name.infog <- results.btsp[[i]][[4]]
-    
-    fea.top.sam <- cbind.all(fea.top.sam, fea.rank.name.sam[1:(num.sel.fea)])  # add the top features from this round to the whole record
-    fea.rank.sam <- data.frame(rank = seq(1, num.fea))
-    row.names(fea.rank.sam) <- fea.rank.name.sam
-    fea.rank.merge.sam <- merge(fea.rank.merge.sam, fea.rank.sam, by = 'row.names')
-    row.names(fea.rank.merge.sam) <- fea.rank.merge.sam$Row.names
-    fea.rank.merge.sam <- fea.rank.merge.sam[, -1]
-    
-    fea.top.geode <- cbind.all(fea.top.geode, fea.rank.name.geode[1:(num.sel.fea)])  # all the top features for this round to the whole record
-    fea.rank.geode <- data.frame(rank = seq(1, num.fea))
-    row.names(fea.rank.geode) <- fea.rank.name.geode
-    fea.rank.merge.geode <- merge(fea.rank.merge.geode, fea.rank.geode, by = 'row.names')
-    row.names(fea.rank.merge.geode) <- fea.rank.merge.geode$Row.names
-    fea.rank.merge.geode <- fea.rank.merge.geode[, -1]
-    
-    fea.top.ref <- cbind.all(fea.top.ref, fea.rank.name.ref[1:(num.sel.fea)])  # add the top features for this round to the whole record
-    colnames(fea.rank.ref) <- 'rank'
-    fea.rank.ref['rank'] <- seq(1, num.fea)
-    fea.rank.merge.ref <- merge(fea.rank.merge.ref, fea.rank.ref, by = 'row.names')
-    row.names(fea.rank.merge.ref) <- fea.rank.merge.ref$Row.names
-    fea.rank.merge.ref <- fea.rank.merge.ref[, -1]
-    
-    fea.top.infog <- cbind.all(fea.top.infog, fea.rank.name.infog[1:(num.sel.fea)])  # add the top features for this round to the whole record
-    fea.rank.infog <- data.frame(rank = seq(1, num.fea))
-    row.names(fea.rank.infog) <- fea.rank.name.infog
-    fea.rank.merge.infog <- merge(fea.rank.merge.infog, fea.rank.infog, by = 'row.names')
-    row.names(fea.rank.merge.infog) <- fea.rank.merge.infog$Row.names
-    fea.rank.merge.infog <- fea.rank.merge.infog[, -1]
+    # print(paste('infog', str(fea.rank.name.infog)))
+
+#     fea.top.sam <- cbind.all(fea.top.sam, fea.rank.name.sam[1:(num.sel.fea)])  # add the top features from this round to the whole record
+#     fea.rank.sam <- data.frame(rank = seq(1, num.fea))
+#     row.names(fea.rank.sam) <- fea.rank.name.sam
+#     fea.rank.merge.sam <- merge(fea.rank.merge.sam, fea.rank.sam, by = 'row.names')
+#     row.names(fea.rank.merge.sam) <- fea.rank.merge.sam$Row.names
+#     fea.rank.merge.sam <- fea.rank.merge.sam[, -1]
+#     
+#     fea.top.geode <- cbind.all(fea.top.geode, fea.rank.name.geode[1:(num.sel.fea)])  # all the top features for this round to the whole record
+#     fea.rank.geode <- data.frame(rank = seq(1, num.fea))
+#     row.names(fea.rank.geode) <- fea.rank.name.geode
+#     fea.rank.merge.geode <- merge(fea.rank.merge.geode, fea.rank.geode, by = 'row.names')
+#     row.names(fea.rank.merge.geode) <- fea.rank.merge.geode$Row.names
+#     fea.rank.merge.geode <- fea.rank.merge.geode[, -1]
+#     
+#     fea.top.ref <- cbind.all(fea.top.ref, fea.rank.name.ref[1:(num.sel.fea)])  # add the top features for this round to the whole record
+#     fea.rank.ref <- data.frame(rank = seq(1, num.fea))
+#     row.names(fea.rank.ref) <- fea.rank.name.ref
+#     fea.rank.merge.ref <- merge(fea.rank.merge.ref, fea.rank.ref, by = 'row.names')
+#     row.names(fea.rank.merge.ref) <- fea.rank.merge.ref$Row.names
+#     fea.rank.merge.ref <- fea.rank.merge.ref[, -1]
+#     
+#     fea.top.infog <- cbind.all(fea.top.infog, fea.rank.name.infog[1:(num.sel.fea)])  # add the top features for this round to the whole record
+#     fea.rank.infog <- data.frame(rank = seq(1, num.fea))
+#     row.names(fea.rank.infog) <- fea.rank.name.infog
+#     fea.rank.merge.infog <- merge(fea.rank.merge.infog, fea.rank.infog, by = 'row.names')
+#     row.names(fea.rank.merge.infog) <- fea.rank.merge.infog$Row.names
+#     fea.rank.merge.infog <- fea.rank.merge.infog[, -1]
   }
   # =============== Stability Calculation ===============
   
@@ -255,8 +257,7 @@ efsis <- function(){
   fea.rank.merge.efsis <- fea.rank.merge.efsis[, -1]
   colnames(fea.rank.merge.efsis) <- c('final.rank', 'sam.rank', 'geode.rank', 'ref.rank', 'infog.rank')
   
-  fea.rank.merge.efsos <- data.frame(temp = rep(0, num.fea))
-  row.names(fea.rank.merge.efsos) <- row.names(fea.rank.merge.efsis)
+  fea.rank.merge.efsos <- fea.rank.merge.efsis
   
   for (line in c(1:num.fea)){
     # integrage SAM, GeoDE, Ref, infog
@@ -270,9 +271,9 @@ efsis <- function(){
       (fea.rank.merge.efsis$geode.rank[line])^rank.stab.geode * (fea.rank.merge.efsis$ref.rank[line])^rank.stab.ref * 
       (fea.rank.merge.efsis$infog.rank[line])^rank.stab.infog
     
-    fea.rank.merge.efsos$final.rank.sam.geode.ref.infog[line] <- (fea.rank.merge.efsosis$sam.rank[line]) * 
-      (fea.rank.merge.efsosis$geode.rank[line]) * (fea.rank.merge.efsosis$ref.rank[line]) * 
-      (fea.rank.merge.efsosis$infog.rank[line])
+    fea.rank.merge.efsos$final.rank.sam.geode.ref.infog[line] <- (fea.rank.merge.efsos$sam.rank[line]) * 
+      (fea.rank.merge.efsos$geode.rank[line]) * (fea.rank.merge.efsos$ref.rank[line]) * 
+      (fea.rank.merge.efsos$infog.rank[line])
   }
   ## Pick top features as feature subset
   # integrage SAM, GeoDE, Ref, infog
@@ -292,7 +293,7 @@ efsis <- function(){
 # Load the data
 data.raw <- read.arff(paste(path.data, data.file, sep = ''))  # row -> sample, column -> feature
 
-# Get the general information about this dataset
+# Get the general information about this dataset 
 num.sample <- nrow(data.raw)  # number of samples
 num.fea <- ncol(data.raw) - 1  # number of features, but notice that the last column is the label
 nums.sel.fea <- ceiling(num.fea * percent.sel.fea)
@@ -324,8 +325,8 @@ for (num.sel.fea in c(nums.sel.fea)){
   sel.fea.efsos.folds <- data.frame()
   sel.fea.efsis.folds <- data.frame()
   
-  auc.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'EFSIS'))
-  time.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'EFSIS'))
+  auc.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'EFSOS','EFSIS'))
+  time.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'EFSOS','EFSIS'))
   
   stab.efsis.indv.folds <- data.frame()  # record the stability of the individual methods inside EFSIS
   
@@ -407,7 +408,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     # print('Start selecting features using ReliefF')
     start.time <- proc.time()
     data.ref <- data.frame(t(x.train), y.train, check.names = F)  # add the param to avoid changing '-' to '.'
-    estReliefF <- attrEval('y.train', data.ref, estimator = 'ReliefFexpRank', ReliefIterations = 30)
+    estReliefF <- attrEval('y.train', data.ref, estimator = 'ReliefFexpRank', ReliefIterations = -2, maxThreads = 1)
     names(estReliefF) <- fea.name  # It's very annoying that 'attrEval' will change the '-' in the names to '.'
     fea.rank.ref <- estReliefF[order(abs(estReliefF), decreasing = T)]
     fea.rank.name.ref <- names(fea.rank.ref)
@@ -473,13 +474,13 @@ for (num.sel.fea in c(nums.sel.fea)){
     
     # =============== Feature Selection using EFSIS & EFSOS===============
     
-    # print('Start selecting features using EFSIS')
+    # print('Start selecting features using EFSIS and EFSOS')
     start.time <- proc.time()
     num.resample.control <- length(index.train.control)  # using bootsrap, so number of sampled samples in each round equals the original #
     num.resample.treat <- length(index.train.treat)
     output.list.efsis <- efsis()
     sel.fea.efsis <- output.list.efsis$sel.fea.efsis
-    sel.fea.efsos <- output.list.efsos$sel.fea.efsos
+    sel.fea.efsos <- output.list.efsis$sel.fea.efsos
     end.time <- proc.time()
     time.taken.efsis <- end.time - start.time
     #     cat('Time taken by EFSIS:', '\n')
@@ -505,12 +506,12 @@ for (num.sel.fea in c(nums.sel.fea)){
     time.all <- c(time.taken.sam, time.taken.geode, time.taken.ref, time.taken.infog, time.taken.func, time.taken.efsis)
     time.all.folds <- cbind.all(time.all.folds, time.all)
     
-    print('Finished selecting features')
+    # print('Finished selecting features and start prediction')
     
     # =============== END of Selecting Features ===============
     
     # =============== Prediction ===============
-    print('Start prediction')
+    # print('Start prediction')
     
     # Prepare the data sets for classificaion, usually row --> sample, col --> feature
     
