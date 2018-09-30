@@ -348,7 +348,7 @@ for (num.sel.fea in c(nums.sel.fea)){
   sel.fea.efsis.folds <- data.frame()
   
   auc.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'EFSOS','EFSIS'))
-  time.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'EFSOS','EFSIS'))
+  time.all.folds <- data.frame(row.names = c('sam', 'geode', 'ref', 'infog', 'func', 'EFSOS/EFSIS'))
   
   stab.efsis.indv.folds <- data.frame()  # record the stability of the individual methods inside EFSIS
   
@@ -382,11 +382,11 @@ for (num.sel.fea in c(nums.sel.fea)){
     y.train <- data.train[, pos.label]
     y.test <- data.test[, pos.label]
     
-    start.time.func <- proc.time()  # Starting time for function perturbation (include the time taken by each individual method)
+    start.time.func <- proc.time()[3][3]  # Starting time for function perturbation (include the time taken by each individual method)
     # =============== Feature Selection using SAM ===============
     
     # print('Start selecting features using SAM')
-    start.time <- proc.time()
+    start.time <- proc.time()[3]
     label.sam <- factor(y.train)
     levels(label.sam) <- c('1', '2')
     data.sam <- list(x=x.train, y=factor(label.sam), genenames=paste("gene",as.character(fea.name),sep=""), geneid=as.character(fea.name), logged2=TRUE)  
@@ -404,7 +404,7 @@ for (num.sel.fea in c(nums.sel.fea)){
       fea.rank.name.sam[j] <- fea.name[fea.rank.sam.pos[j]]
     }
     sel.fea.sam <- fea.rank.name.sam[1:num.sel.fea]
-    end.time <- proc.time()
+    end.time <- proc.time()[3]
     time.taken.sam <- end.time - start.time
     #     cat('Time taken by SAM:', '\n')
     #     cat(time.taken[1], '\n')
@@ -412,7 +412,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     # =============== Feature Selection using GeoDE ===============
     
     # print('Start selecting features using GeoDE')
-    start.time <- proc.time()
+    start.time <- proc.time()[3]
     gammas <- 1
     data.geode <- data.frame(fea.name, x.train)
     label.geode <- factor(y.train)
@@ -420,7 +420,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     chdir.analysis <- chdirAnalysis(data.geode, factor(label.geode), gammas, CalculateSig=FALSE, nnull=10)
     fea.rank.name.geode <- names(chdir.analysis$results[[1]])  # the ranked feature list
     sel.fea.geode <- fea.rank.name.geode[1:num.sel.fea]
-    end.time <- proc.time()
+    end.time <- proc.time()[3]
     time.taken.geode <- end.time - start.time
     #     cat('Time taken by GeoDE:', '\n')
     #     cat(time.taken[1], '\n')
@@ -428,14 +428,14 @@ for (num.sel.fea in c(nums.sel.fea)){
     # =============== Feature Selection using ReliefF ===============
     
     # print('Start selecting features using ReliefF')
-    start.time <- proc.time()
+    start.time <- proc.time()[3]
     data.ref <- data.frame(t(x.train), y.train, check.names = F)  # add the param to avoid changing '-' to '.'
     estReliefF <- attrEval('y.train', data.ref, estimator = 'ReliefFexpRank', ReliefIterations = -2, maxThreads = 1)
     names(estReliefF) <- fea.name  # It's very annoying that 'attrEval' will change the '-' in the names to '.'
     fea.rank.ref <- estReliefF[order(abs(estReliefF), decreasing = T)]
     fea.rank.name.ref <- names(fea.rank.ref)
     sel.fea.ref <- fea.rank.name.ref[1:num.sel.fea]
-    end.time <- proc.time()
+    end.time <- proc.time()[3]
     time.taken.ref <- end.time - start.time
     #     cat('Time taken by ReliefF:', '\n')
     #     cat(time.taken[1], '\n')
@@ -443,13 +443,13 @@ for (num.sel.fea in c(nums.sel.fea)){
     # =============== Feature Selection using Information Gain ===============
     
     # print('Start selecting features using Information Gain')
-    start.time <- proc.time()
+    start.time <- proc.time()[3]
     data.infog <- data.frame(t(x.train), y.train, check.names = F)
     weights <- information_gain(y.train~., data.infog)
     fea.rank.infog <- weights[order(weights$importance, decreasing = T), , drop = F]
     fea.rank.name.infog <- fea.rank.infog$attributes
     sel.fea.infog <- fea.rank.name.infog[1:num.sel.fea]
-    end.time <- proc.time()
+    end.time <- proc.time()[3]
     time.taken.infog <- end.time - start.time
     #     cat('Time taken by Information Gain:', '\n')
     #     cat(time.taken[1], '\n')
@@ -489,7 +489,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     ## Pick top features as feature subset
     fea.order.func <- fea.rank.merge.func[order(fea.rank.merge.func$final.rank), ]
     sel.fea.func <- row.names(fea.order.func[1:num.sel.fea, ])
-    end.time <- proc.time()
+    end.time <- proc.time()[3]
     time.taken.func <- end.time - start.time
     #     cat('Time taken by Function Perturbation:', '\n')
     #     cat(time.taken[1], '\n')
@@ -497,13 +497,13 @@ for (num.sel.fea in c(nums.sel.fea)){
     # =============== Feature Selection using EFSIS & EFSOS===============
     
     # print('Start selecting features using EFSIS and EFSOS')
-    start.time <- proc.time()
+    start.time <- proc.time()[3]
     num.resample.control <- length(index.train.control)  # using bootsrap, so number of sampled samples in each round equals the original #
     num.resample.treat <- length(index.train.treat)
     output.list.efsis <- efsis()
     sel.fea.efsis <- output.list.efsis$sel.fea.efsis
     sel.fea.efsos <- output.list.efsis$sel.fea.efsos
-    end.time <- proc.time()
+    end.time <- proc.time()[3]
     time.taken.efsis <- end.time - start.time
     #     cat('Time taken by EFSIS:', '\n')
     #     cat(time.taken[1], '\n')
