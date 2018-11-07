@@ -45,7 +45,7 @@ plot.stab.line <- function(data.set, script.version) {
   df.stabs$percent.sel.fea <- percent.sel.fea * 100
   stabs.long <- melt(df.stabs, id = 'percent.sel.fea')
   pic <- ggplot(data = stabs.long, aes(x = percent.sel.fea, y = value, linetype = variable, colour = variable, shape = variable)) + 
-    geom_line(size = 1) + geom_point(size = 2.5) + labs(x = 'Number of selected features', y = 'Stability', title = data.set) + 
+    geom_line(size = 1) + geom_point(size = 2.5) + labs(x = 'Percentage of selected features (%)', y = 'Stability', title = data.set) + 
     theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 15, face = "bold"), 
                        axis.text=element_text(size=13), axis.title=element_text(size=13, face = 'bold'), 
                        legend.text=element_text(size=12), legend.title = element_blank())
