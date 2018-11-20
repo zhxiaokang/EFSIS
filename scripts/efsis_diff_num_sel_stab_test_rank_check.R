@@ -134,9 +134,9 @@ for (num.sel.fea in c(nums.sel.fea)){
     # =============== Feature Selection using SAM ===============
     
     # print('Start selecting features using SAM')
-    label.geode <- factor(y.train)
-    levels(label.geode) <- c('1', '2')
-    data.sam <- list(x=x.train, y=factor(label.geode), genenames=paste("gene",as.character(fea.name),sep=""), geneid=as.character(fea.name), logged2=TRUE)  
+    label.sam <- factor(y.train)
+    levels(label.sam) <- c('1', '2')
+    data.sam <- list(x=x.train, y=factor(label.sam), genenames=paste("gene",as.character(fea.name),sep=""), geneid=as.character(fea.name), logged2=TRUE)  
     invisible(capture.output(samr.obj <- samr(data.sam, resp.type="Two class unpaired", nperms=100)))
     invisible(capture.output(delta.table <- samr.compute.delta.table(samr.obj)))
     del <- -3
@@ -223,9 +223,9 @@ for (num.sel.fea in c(nums.sel.fea)){
       y.train.resample <- y.train[id.train.resample]
       
       # use SAM to rank the features
-      label.geode <- factor(y.train.resample)
-      levels(label.geode) <- c('1', '2')
-      data.sam <- list(x=x.train.resample, y=factor(label.geode), genenames=paste("gene",as.character(fea.name),sep=""), geneid=as.character(fea.name), logged2=TRUE)  
+      label.sam <- factor(y.train.resample)
+      levels(label.sam) <- c('1', '2')
+      data.sam <- list(x=x.train.resample, y=factor(label.sam), genenames=paste("gene",as.character(fea.name),sep=""), geneid=as.character(fea.name), logged2=TRUE)  
       invisible(capture.output(samr.obj <- samr(data.sam, resp.type="Two class unpaired", nperms=100)))
       invisible(capture.output(delta.table <- samr.compute.delta.table(samr.obj)))
       del <- -3
@@ -379,35 +379,35 @@ for (num.sel.fea in c(nums.sel.fea)){
     fea.order.efsis.sam.geode.ref.chs <- fea.rank.merge.efsis[order(fea.rank.merge.efsis$final.rank.sam.geode.ref.chs), ]
     sel.fea.efsis.form.sam.geode.ref.chs <- row.names(fea.order.efsis.sam.geode.ref.chs[1:num.sel.fea, ])
     
-    # use RankAggreg to get the efsis ranking list
-    rank.list.sam <- row.names(fea.rank.merge.sam[order(fea.rank.merge.sam[, 'final.rank']), ])
-    rank.list.geode <- row.names(fea.rank.merge.geode[order(fea.rank.merge.geode[, 'final.rank']), ])
-    rank.list.ref <- row.names(fea.rank.merge.ref[order(fea.rank.merge.ref[, 'final.rank']), ])
-    rank.list.chs <- row.names(fea.rank.merge.chs[order(fea.rank.merge.chs[, 'final.rank']), ])
-    # integrage SAM, GeoDE
-    rank.stab <- rank(c(stab.sam, stab.geode))  ## different from rank in formular, since will be used as importance here, the higher stab -- the higher importance
-    rank.stab.sam <- rank.stab[1]
-    rank.stab.geode <- rank.stab[2]
-    rank.matrix.sam.geode <- rbind(rank.list.sam, rank.list.geode)
-    invisible(capture.output(rank.list.efsis.sam.geode <- RankAggreg(rank.matrix.sam.geode, num.sel.fea, NULL, method = 'GA', importance = c(rank.stab.sam, rank.stab.geode))))
-    sel.fea.efsis.consensus.sam.geode <- rank.list.efsis.sam.geode$top.list
-    # integrage Ref, Chs
-    rank.stab <- rank(c(stab.ref, stab.chs))
-    rank.stab.ref <- rank.stab[1]
-    rank.stab.chs <- rank.stab[2]
-    rank.matrix.ref.chs <- rbind(rank.list.ref, rank.list.chs)
-    invisible(capture.output(rank.list.efsis.ref.chs <- RankAggreg(rank.matrix.ref.chs, num.sel.fea, NULL, method = 'GA', importance = c(rank.stab.ref, rank.stab.chs))))
-    sel.fea.efsis.consensus.ref.chs <- rank.list.efsis.ref.chs$top.list
-    # integrage SAM, GeoDE, Ref, Chs
-    rank.stab <- rank(c(stab.sam, stab.geode, stab.ref, stab.chs))
-    rank.stab.sam <- rank.stab[1]
-    rank.stab.geode <- rank.stab[2]
-    rank.stab.ref <- rank.stab[3]
-    rank.stab.chs <- rank.stab[4]
-    rank.matrix.sam.geode.ref.chs <- rbind(rank.list.sam, rank.list.geode, rank.list.ref, rank.list.chs)
-    invisible(capture.output(rank.list.efsis.sam.geode.ref.chs <- RankAggreg(rank.matrix.sam.geode.ref.chs, num.sel.fea, NULL, method = 'GA', importance = c(rank.stab.sam, rank.stab.geode, rank.stab.ref, rank.stab.chs))))
-    sel.fea.efsis.consensus.sam.geode.ref.chs <- rank.list.efsis.sam.geode.ref.chs$top.list
-    
+#     # use RankAggreg to get the efsis ranking list
+#     rank.list.sam <- row.names(fea.rank.merge.sam[order(fea.rank.merge.sam[, 'final.rank']), ])
+#     rank.list.geode <- row.names(fea.rank.merge.geode[order(fea.rank.merge.geode[, 'final.rank']), ])
+#     rank.list.ref <- row.names(fea.rank.merge.ref[order(fea.rank.merge.ref[, 'final.rank']), ])
+#     rank.list.chs <- row.names(fea.rank.merge.chs[order(fea.rank.merge.chs[, 'final.rank']), ])
+#     # integrage SAM, GeoDE
+#     rank.stab <- rank(c(stab.sam, stab.geode))  ## different from rank in formular, since will be used as importance here, the higher stab -- the higher importance
+#     rank.stab.sam <- rank.stab[1]
+#     rank.stab.geode <- rank.stab[2]
+#     rank.matrix.sam.geode <- rbind(rank.list.sam, rank.list.geode)
+#     invisible(capture.output(rank.list.efsis.sam.geode <- RankAggreg(rank.matrix.sam.geode, num.sel.fea, NULL, method = 'GA', importance = c(rank.stab.sam, rank.stab.geode))))
+#     sel.fea.efsis.consensus.sam.geode <- rank.list.efsis.sam.geode$top.list
+#     # integrage Ref, Chs
+#     rank.stab <- rank(c(stab.ref, stab.chs))
+#     rank.stab.ref <- rank.stab[1]
+#     rank.stab.chs <- rank.stab[2]
+#     rank.matrix.ref.chs <- rbind(rank.list.ref, rank.list.chs)
+#     invisible(capture.output(rank.list.efsis.ref.chs <- RankAggreg(rank.matrix.ref.chs, num.sel.fea, NULL, method = 'GA', importance = c(rank.stab.ref, rank.stab.chs))))
+#     sel.fea.efsis.consensus.ref.chs <- rank.list.efsis.ref.chs$top.list
+#     # integrage SAM, GeoDE, Ref, Chs
+#     rank.stab <- rank(c(stab.sam, stab.geode, stab.ref, stab.chs))
+#     rank.stab.sam <- rank.stab[1]
+#     rank.stab.geode <- rank.stab[2]
+#     rank.stab.ref <- rank.stab[3]
+#     rank.stab.chs <- rank.stab[4]
+#     rank.matrix.sam.geode.ref.chs <- rbind(rank.list.sam, rank.list.geode, rank.list.ref, rank.list.chs)
+#     invisible(capture.output(rank.list.efsis.sam.geode.ref.chs <- RankAggreg(rank.matrix.sam.geode.ref.chs, num.sel.fea, NULL, method = 'GA', importance = c(rank.stab.sam, rank.stab.geode, rank.stab.ref, rank.stab.chs))))
+#     sel.fea.efsis.consensus.sam.geode.ref.chs <- rank.list.efsis.sam.geode.ref.chs$top.list
+#     
     # =============== END of Selecting Features using efsis ===============
     output.list.efsis <- data.frame('sel.fea.efsis.form.sam.geode' = sel.fea.efsis.form.sam.geode, 'sel.fea.efsis.form.ref.chs' = sel.fea.efsis.form.ref.chs, 'sel.fea.efsis.form.sam.geode.ref.chs' = sel.fea.efsis.form.sam.geode.ref.chs, 
                         'sel.fea.efsis.consensus.sam.geode' = sel.fea.efsis.consensus.sam.geode, 'sel.fea.efsis.consensus.ref.chs' = sel.fea.efsis.consensus.ref.chs, 'sel.fea.efsis.consensus.sam.geode.ref.chs' = sel.fea.efsis.consensus.sam.geode.ref.chs,

@@ -22,9 +22,11 @@ library(ggplot2)
 # ============ Parameters definition ===========
 path.script <- setwd('./')  # the path to the script
 args <- commandArgs(TRUE)
+# data.set <- 'DLBCL'
 data.set <- args[1]
 path.data <- paste('../data/', data.set, '/', sep = '')  # path to the data
 data.file <- list.files(path = path.data, pattern = '.arff')
+# script.version <- 'efsosParal'
 script.version <- args[2]
 percent.sel.fea <- c(0.3, 0.5, 0.7, 1, 1.5, 2, 3, 4, 5) / 100
 k.folds <- 10  # k-fold cross validation
@@ -162,8 +164,8 @@ efsis <- function(){
     fea.rank.ref <- data.frame(importance = fea.rank.ref)
     fea.rank.name.ref <- rownames(fea.rank.ref)  # the ranked feature list for this round
     fea.top.ref <- cbind.all(fea.top.ref, fea.rank.name.ref[1:(num.sel.fea)])  # add the top features for this round to the whole record
-    colnames(fea.rank.ref) <- 'rank'
-    fea.rank.ref['rank'] <- seq(1, num.fea)
+    fea.rank.ref <- data.frame(rank = seq(1, num.fea))
+    row.names(fea.rank.ref) <- fea.rank.name.ref
     fea.rank.merge.ref <- merge(fea.rank.merge.ref, fea.rank.ref, by = 'row.names')
     row.names(fea.rank.merge.ref) <- fea.rank.merge.ref$Row.names
     fea.rank.merge.ref <- fea.rank.merge.ref[, -1]
@@ -279,7 +281,7 @@ num.sample <- nrow(data.raw)  # number of samples
 num.fea <- ncol(data.raw) - 1  # number of features, but notice that the last column is the label
 nums.sel.fea <- ceiling(num.fea * percent.sel.fea)
 pos.label <- num.fea + 1  # the position of the label marked in the dataset
-fea.name <- colnames(data.raw[1:num.fea])
+fea.name <- colnames(data.raw)[1:num.fea]
 
 # Split into training and test sets
 labels <- data.raw[, pos.label]
@@ -598,7 +600,7 @@ for (num.sel.fea in c(nums.sel.fea)){
   stab.efsos <- stab(sel.fea.efsos.folds)
   stab.efsis <- stab(sel.fea.efsis.folds)
   
-  stab.all <- c(stab.sam, stab.geode, stab.ref, stab.infog, stab.func, stab.efsis)
+  stab.all <- c(stab.sam, stab.geode, stab.ref, stab.infog, stab.func, stab.efsos, stab.efsis)
   # save the stability for this #-sel-fea to file
   write.table(stab.all, paste(path.data, 'num', num.sel.fea, '-stab-', script.version, '.txt', sep = ''), quote = F, col.names = F, row.names = F)
 }
