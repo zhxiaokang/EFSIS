@@ -179,15 +179,19 @@ efsis <- function(){
   
   # Check whether the output is correct, otherwise repeat this multi-thread processing
   round.count <- 1
+  num.redo.paral <- 0
   while (round.count <= num.round){
     if (length(results.btsp[[round.count]]) == 4) {
       round.count <- round.count + 1
     }
     else {
       round.count <- 1
+      num.redo.paral <- num.redo.paral + 1
       results.btsp <- mclapply(rounds.btsp, boot.strap, mc.cores = num.cores, mc.preschedule = FALSE)
     }
   }
+  
+  print(paste('Times of redo parallel computing:', num.redo.paral))
   
   for (i in c(1:num.round)){
     fea.rank.name.sam <- results.btsp[[i]]$sam
@@ -382,7 +386,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     y.train <- data.train[, pos.label]
     y.test <- data.test[, pos.label]
     
-    start.time.func <- proc.time()[3][3]  # Starting time for function perturbation (include the time taken by each individual method)
+    start.time.func <- proc.time()[3]  # Starting time for function perturbation (include the time taken by each individual method)
     # =============== Feature Selection using SAM ===============
     
     # print('Start selecting features using SAM')
