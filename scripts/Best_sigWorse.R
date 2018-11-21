@@ -1,4 +1,4 @@
-# Use wilcoxonSignedTest to check if there are significant differences between the best method and the others
+# Use wilcoxon Signed Test to check if there are significant differences between the best method and the others
 
 library(foreign)
 library(scmamp)
