@@ -29,7 +29,7 @@ efsis <- function(num.fea, fea.name, num.round, num.cores, label.train, num.resa
   seed.resample <- 1234
   
   # define the function of boot.strap
-  boot.strap <- function(seed.resample, round.btsp) {
+  boot.strap <- function(round.btsp) {
     seed.resample <- seed.resample + round.btsp
     set.seed(seed = seed.resample)
     id.train.resample <- c(sample(x = which(label.train == levels(label.train)[1]), size = num.resample.control, replace = T), sample(x = which(label.train == levels(label.train)[2]), size = num.resample.treat, replace = T))
