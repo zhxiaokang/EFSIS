@@ -231,7 +231,7 @@ for (num.sel.fea in c(nums.sel.fea)){
     start.time <- proc.time()[3]
     num.resample.control <- length(index.train.control)  # using bootsrap, so number of sampled samples in each round equals the original #
     num.resample.treat <- length(index.train.treat)
-    output.list.efsis <- efsis(num.fea, fea.name, num.round, num.cores)
+    output.list.efsis <- efsis(num.fea, fea.name, num.round, num.cores, label.train, num.resample.control, num.resample.treat, x.train, y.train)
     sel.fea.efsis <- output.list.efsis$sel.fea.efsis
     sel.fea.efsos <- output.list.efsis$sel.fea.efsos
     end.time <- proc.time()[3]
